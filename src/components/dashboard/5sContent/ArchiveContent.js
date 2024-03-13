@@ -4,7 +4,9 @@ import Content from "../Content";
 import addIcon from "../../../static/images/add.png";
 
 const ArchiveContent = () => {
-  const urls = [`https://localhost:7124/api/ratings/`];
+  const urls = [
+    `https://fivesai-backend-production.up.railway.app/api/ratings/`,
+  ];
 
   const [archiveHeaders] = useState([
     { Header: "Id", accessor: "id" },

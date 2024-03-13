@@ -17,7 +17,9 @@ const Overlay = memo(
       const fetchBuildings = async () => {
         try {
           await axios
-            .get(`https://localhost:7124/api/buildings`)
+            .get(
+              `https://fivesai-backend-production.up.railway.app/api/buildings`
+            )
             .then((data) => {
               setBuildings(data.data);
             });

@@ -27,9 +27,11 @@ const Overlay = (props) => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        await axios.get(`https://localhost:7124/api/rooms`).then((data) => {
-          setRooms(data.data);
-        });
+        await axios
+          .get(`https://fivesai-backend-production.up.railway.app/api/rooms`)
+          .then((data) => {
+            setRooms(data.data);
+          });
       } catch (error) {
         console.log(error);
       }

@@ -20,7 +20,7 @@ const BuildingOverlay = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
-        `http://localhost:7124/api/comment/${data.id}/comment`
+        `http://fivesai-backend-production.up.railway.app/api/comment/${data.id}/comment`
       );
       console.log(response.data);
       setCommentData(response.data);
