@@ -1,0 +1,93 @@
+.editOverlay,
+.deleteOverlay {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  padding: 2.5rem;
+}
+
+.deleteOverlay {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+.deleteOverlay h1 {
+  color: #ff1c1c;
+}
+
+.editOverlay {
+  width: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.editBtn {
+  background-color: #5656ff !important;
+  border-color: #1515ff !important;
+}
+
+.editBtn:hover {
+  background-color: #1515ff !important;
+}
+
+.addBtn {
+  background-color: #3cff3c !important;
+  border-color: #00ff00 !important;
+}
+
+.addBtn:hover {
+  border-color: #00ff00 !important;
+}
+
+.editForm {
+  display: flex;
+  background-color: #ffd95d;
+  border-radius: 10px;
+  padding: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  gap: 5%;
+}
+
+.editForm input {
+  border-radius: 15px;
+  border: none;
+  width: 100%;
+  background-color: #efefef;
+
+  padding: 20px;
+}
+
+.editPreview {
+  width: 64px;
+}
+.spaceImageContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 3 columns */
+  grid-template-rows: repeat(auto, 1fr); /* 2 rows */
+  grid-gap: 10px; /* gap between grid items */
+}
+
+.spaceImageContainer img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.select {
+  width: 100%;
+  border-radius: 10px;
+  height: 56px;
+  border: none;
+  padding: 2px 5px;
+  background-color: #efefef;
+}

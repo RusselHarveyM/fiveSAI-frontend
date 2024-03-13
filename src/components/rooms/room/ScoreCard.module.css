@@ -1,0 +1,47 @@
+.scoreTitle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #a3a3a3;
+  height: 75%;
+  color: #ccc;
+}
+
+.okhighlight {
+  background-color: #bcffa3 !important;
+}
+
+.okhighlight .scoreTitle {
+  background-color: #66ce41 !important;
+}
+
+.okhighlight .scoreTitle h3 {
+  color: #fff !important;
+}
+
+.okhighlight h3:nth-child(2) {
+  color: #66ce41 !important;
+}
+
+.warnhighlight {
+  background-color: #fff2c7 !important;
+}
+
+.warnhighlight .scoreTitle {
+  background-color: #ffd95e !important;
+}
+
+.warnhighlight .scoreTitle h3 {
+  color: #fff !important;
+}
+
+.warnhighlight h3:nth-child(2) {
+  color: #ffd95e !important;
+}
+
+.scoreTitle h3,
+.spaceBody h3 {
+  background-color: inherit;
+  height: fit-content;
+  width: fit-content;
+}

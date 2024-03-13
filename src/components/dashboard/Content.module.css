@@ -1,0 +1,76 @@
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 75rem;
+  border-radius: 20px;
+  background-color: #fff;
+  margin-top: 2rem;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  width: 95%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tableHeader h1 {
+  font-size: 1.7rem;
+}
+
+.actionBtn {
+  background-color: inherit;
+  border: none;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+.actionBtn img {
+  width: 15px;
+  height: 15px;
+}
+
+.actionBtnChoices {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.actionBtnChoices button {
+  background-color: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+.actionCell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.createEntity {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+.createEntity button {
+  width: 25px;
+  height: 25px;
+  border: none !important ;
+  background-color: inherit !important;
+  cursor: pointer;
+}
+
+.create button img {
+  width: 25px !important;
+  height: 25px;
+}
+
+.addBtn img {
+  width: 25px !important;
+  height: 25px !important;
+}

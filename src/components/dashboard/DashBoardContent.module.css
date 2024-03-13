@@ -1,0 +1,125 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 1024px;
+}
+
+.dashboardCards {
+  width: 55rem;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dashboardCards div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 180px;
+  height: 150px;
+  color: #fff;
+  text-align: center;
+  box-shadow: none;
+}
+
+.dashboardCards div h1 {
+  font-size: 4.3rem;
+}
+
+.dashboardCards div h2 {
+  font-size: 1.3rem;
+}
+
+.item1 {
+  background-color: #8c242c !important;
+  scale: 1.2;
+}
+
+.buildingListContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: #ffd95e;
+  margin: 0 auto;
+  width: 1080px;
+  min-height: 500px;
+  border-radius: 2rem;
+  padding: 1.5rem 4rem;
+}
+
+.buildingImageContainer_header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.buildingImageContainer_header a {
+  border: none;
+  cursor: pointer;
+  background-color: #fff;
+  border-radius: 50%;
+  width: 32px;
+  height: auto;
+  /* box-shadow: 0 3px 8px -3px rgba(0, 0, 0, 0.26); */
+}
+
+.buildingList {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  margin-top: 2rem;
+  justify-items: center;
+  row-gap: 2rem;
+}
+
+.buildingList a {
+  text-decoration: none;
+}
+
+.buildingCards {
+  display: flex;
+  flex-direction: column;
+  width: 180px;
+  height: 180px;
+  cursor: pointer;
+}
+
+.buildingTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  background-color: #8c242c;
+  border-radius: 0 0 10px 10px;
+  color: #fff;
+}
+
+.containerTitle {
+  color: #8c242c;
+}
+
+/* .buildingCard {
+  height: 300px;
+  width: 450px;
+} */
+
+.buildingImageContainer {
+  /* height: 80%; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.buildingImageContainer img {
+  width: 180px;
+  height: 140px;
+  border-radius: 10px 10px 0 0;
+}
+
+.buildingLength {
+  padding: 0.3px 5px;
+  font-size: 0.8rem;
+  background-color: #fff;
+  border-radius: 0.5rem;
+  border: 3px solid #8c242c;
+}

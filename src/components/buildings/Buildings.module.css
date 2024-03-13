@@ -1,0 +1,23 @@
+.buildingsContainer,
+.buildingsContainer_lists {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.buildingsContainer {
+  align-items: center;
+  width: 1024px;
+  margin: 0 auto;
+  margin-top: 2rem;
+  gap: 2rem;
+}
+
+.buildingsContainer_lists {
+  width: 100%;
+  gap: 10px;
+}
+
+.buildingsContainer_cards {
+  height: 6rem;
+}

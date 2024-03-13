@@ -1,0 +1,121 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 10px;
+  width: 700px;
+  height: auto;
+  color: #731c23;
+  align-items: center;
+  gap: 20px;
+}
+
+.imageContainer {
+  display: grid;
+  grid-template-columns: repeat(5, 5rem);
+  grid-template-rows: repeat(auto, 5rem);
+  padding: 1rem;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 95%;
+  height: auto;
+  border-radius: 10px;
+  background-color: #ffd95d;
+}
+
+.image,
+.uploadImage {
+  border-radius: 10px;
+  width: 5rem;
+  height: 5rem;
+  border: none;
+}
+
+.container_header {
+  display: flex;
+  gap: 10px;
+}
+
+.evaluateBtn,
+.editBtn,
+.cancelBtn,
+.confirmBtn {
+  cursor: pointer;
+  color: #fff;
+  padding: 0.5rem 2.5rem;
+  border-radius: 10px;
+  border: none;
+}
+
+.evaluateBtn {
+  background-color: #731c23;
+}
+
+.cancelBtn {
+  background-color: #fd3243;
+}
+
+.confirmBtn {
+  background-color: #57dc27;
+}
+
+.editBtn {
+  background-color: #f6ca38;
+}
+
+.editBtnContainer {
+  display: flex;
+  border: 1px solid #731c23;
+  padding: 2px 5px;
+  border-radius: 10px;
+  gap: 10px;
+}
+
+.buttonsContainer {
+  display: flex;
+  gap: 10px;
+}
+
+.deleteImageBtn {
+  position: absolute;
+  /* right: 70%; */
+  /* top: -70%; */
+  cursor: pointer;
+  border: none;
+  background-color: #de1021;
+  color: #fff;
+  padding: 0 0.2rem;
+  text-align: center;
+  border-radius: 100%;
+}
+.uploadImage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed #731c23;
+  cursor: pointer;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 10px;
+}
+
+.newImage {
+  border: 1px dashed #731c23;
+  padding: 4px;
+}
+
+.uploadImage img {
+  cursor: pointer;
+  height: inherit;
+  width: inherit;
+  object-fit: contain;
+  /* box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.21); */
+  border-radius: 1rem;
+}
