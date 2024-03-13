@@ -4,7 +4,7 @@ import addIcon from "../../../static/images/add-building-2.png";
 import Overlay from "../../UI/Modal/BuildingOverlay";
 
 const BuildingContent = ({ onData }) => {
-  const urls = [`https://localhost:7124/api/buildings/`];
+  const urls = [`https://fivesai-backend/api/buildings/`];
 
   const [buildingHeaders] = useState([
     { Header: "Id", accessor: "id" },

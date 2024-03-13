@@ -6,7 +6,7 @@ import addIcon from "../../../static/images/add-room.png";
 import Overlay from "../../UI/Modal/RoomOverlay";
 
 const RoomContent = ({ onData }) => {
-  const urls = [`https://localhost:7124/api/rooms/`];
+  const urls = [`https://fivesai-backend/api/rooms/`];
 
   const [roomHeaders] = useState([
     { Header: "Id", accessor: "id" },

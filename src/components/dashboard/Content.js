@@ -65,7 +65,7 @@ const Content = ({
       if (isMore) {
         try {
           await axios
-            .get(`http://localhost:7124/api/spaceimage/get/${rowId}`)
+            .get(`http://fivesai-backend/api/spaceimage/get/${rowId}`)
             .then((data) => {
               setImages(data);
               console.log(data);

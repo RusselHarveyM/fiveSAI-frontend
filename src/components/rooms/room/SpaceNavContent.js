@@ -8,7 +8,7 @@ import Backdrop from "../../UI/Modal/BackdropModal.js";
 import ViewImageOverlay from "../../UI/Modal/ViewImageOverlay.js";
 import ScoreCard from "./ScoreCard.js";
 
-const apiBaseUrl = "https://localhost:7124/api/spaceimage";
+const apiBaseUrl = "https://fivesai-backend/api/spaceimage";
 
 const SpaceNavContent = (props) => {
   const [spaceTotalScore, setSpaceTotalScore] = useState(10);

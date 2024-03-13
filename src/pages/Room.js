@@ -74,7 +74,7 @@ const Room = () => {
       if (space[0].scores?.length == 0 && space[0].comments?.length == 0) {
         try {
           const resRate = await axios.post(
-            "https://localhost:7124/api/ratings",
+            "https://fivesai-backend/api/ratings",
             newRate
           );
 
@@ -83,7 +83,7 @@ const Room = () => {
           const newComment = createNewComment(resRate.data);
 
           const resComment = await axios.post(
-            "https://localhost:7124/api/comment",
+            "https://fivesai-backend/api/comment",
             newComment
           );
         } catch (error) {
@@ -92,13 +92,13 @@ const Room = () => {
       } else {
         try {
           const resRate = await axios.put(
-            `https://localhost:7124/api/ratings/${space[0].scores?.id}`,
+            `https://fivesai-backend/api/ratings/${space[0].scores?.id}`,
             newRate
           );
 
           const newComment = createNewComment(resRate.data);
           const resComment = await axios.put(
-            `https://localhost:7124/api/comment/${space[0].scores?.id}`,
+            `https://fivesai-backend/api/comment/${space[0].scores?.id}`,
             newComment
           );
         } catch (error) {
@@ -114,7 +114,7 @@ const Room = () => {
     const fetchRoomData = async () => {
       try {
         const response = await axios.get(
-          `https://localhost:7124/api/rooms/${params.roomId}/room`
+          `https://fivesai-backend/api/rooms/${params.roomId}/room`
         );
         setRoomData(response.data);
       } catch (error) {
@@ -127,7 +127,7 @@ const Room = () => {
   useEffect(() => {
     const fetchSpaces = async () => {
       try {
-        const response = await axios.get(`https://localhost:7124/api/space`);
+        const response = await axios.get(`https://fivesai-backend/api/space`);
         console.log("reponse >>>", response);
         console.log("roomData>>>", roomData);
         setSpaces(() => {
@@ -156,8 +156,8 @@ const Room = () => {
         var response;
         var resComment;
         try {
-          response = await axios.get(`https://localhost:7124/api/ratings`);
-          resComment = await axios.get(`https://localhost:7124/api/comment`);
+          response = await axios.get(`https://fivesai-backend/api/ratings`);
+          resComment = await axios.get(`https://fivesai-backend/api/comment`);
         } catch (error) {
           console.log(error);
         }

@@ -10,7 +10,7 @@ const Buildings = () => {
     const fetchData = async () => {
       try {
         await axios
-          .get("http://localhost:7124/api/buildings")
+          .get("http://fivesai-backend/api/buildings")
           .then((response) => {
             console.log(response.body);
             setBuildingData(response.data);
