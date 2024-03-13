@@ -14,7 +14,7 @@ const Rooms = () => {
     const fetchBuildingData = async () => {
       try {
         const response = await axios.get(
-          `https://fivesai-backend/api/buildings/${params.buildingId}/building`
+          `https://fivesai-backend:3000/api/buildings/${params.buildingId}/building`
         );
         setBuildingData(response.data);
       } catch (error) {
@@ -27,7 +27,9 @@ const Rooms = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://fivesai-backend/api/rooms");
+        const response = await axios.get(
+          "https://fivesai-backend:3000/api/rooms"
+        );
         setRoomData(
           response.data.filter(
             (data) => data.buildingId === parseInt(params.buildingId)
