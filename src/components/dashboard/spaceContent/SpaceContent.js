@@ -6,8 +6,8 @@ import Overlay from "../../UI/Modal/SpaceOverlay";
 
 const SpaceContent = () => {
   const urls = [
-    `https://fivesai-backend:3000/api/space/`,
-    `https://fivesai-backend:3000/api/spaceimage/upload/`,
+    `https://fivesai-backend-production.up.railway.app/api/space/`,
+    `https://fivesai-backend-production.up.railway.app/api/spaceimage/upload/`,
   ];
 
   const [spaceHeaders] = useState([

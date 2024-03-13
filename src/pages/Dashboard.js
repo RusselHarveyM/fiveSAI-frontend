@@ -30,7 +30,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://fivesai-backend:3000/api/buildings"
+          "https://fivesai-backend-production.up.railway.app/api/buildings"
         );
         setBuildingData(response.data);
       } catch (error) {

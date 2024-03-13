@@ -74,7 +74,7 @@ const Room = () => {
       if (space[0].scores?.length == 0 && space[0].comments?.length == 0) {
         try {
           const resRate = await axios.post(
-            "https://fivesai-backend:3000/api/ratings",
+            "https://fivesai-backend-production.up.railway.app/api/ratings",
             newRate
           );
 
@@ -83,7 +83,7 @@ const Room = () => {
           const newComment = createNewComment(resRate.data);
 
           const resComment = await axios.post(
-            "https://fivesai-backend:3000/api/comment",
+            "https://fivesai-backend-production.up.railway.app/api/comment",
             newComment
           );
         } catch (error) {
@@ -92,13 +92,13 @@ const Room = () => {
       } else {
         try {
           const resRate = await axios.put(
-            `https://fivesai-backend:3000/api/ratings/${space[0].scores?.id}`,
+            `https://fivesai-backend-production.up.railway.app/api/ratings/${space[0].scores?.id}`,
             newRate
           );
 
           const newComment = createNewComment(resRate.data);
           const resComment = await axios.put(
-            `https://fivesai-backend:3000/api/comment/${space[0].scores?.id}`,
+            `https://fivesai-backend-production.up.railway.app/api/comment/${space[0].scores?.id}`,
             newComment
           );
         } catch (error) {
@@ -114,7 +114,7 @@ const Room = () => {
     const fetchRoomData = async () => {
       try {
         const response = await axios.get(
-          `https://fivesai-backend:3000/api/rooms/${params.roomId}/room`
+          `https://fivesai-backend-production.up.railway.app/api/rooms/${params.roomId}/room`
         );
         setRoomData(response.data);
       } catch (error) {
@@ -128,7 +128,7 @@ const Room = () => {
     const fetchSpaces = async () => {
       try {
         const response = await axios.get(
-          `https://fivesai-backend:3000/api/space`
+          `https://fivesai-backend-production.up.railway.app/api/space`
         );
         console.log("reponse >>>", response);
         console.log("roomData>>>", roomData);
@@ -159,10 +159,10 @@ const Room = () => {
         var resComment;
         try {
           response = await axios.get(
-            `https://fivesai-backend:3000/api/ratings`
+            `https://fivesai-backend-production.up.railway.app/api/ratings`
           );
           resComment = await axios.get(
-            `https://fivesai-backend:3000/api/comment`
+            `https://fivesai-backend-production.up.railway.app/api/comment`
           );
         } catch (error) {
           console.log(error);

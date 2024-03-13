@@ -12,7 +12,7 @@ const DashBoardContent = () => {
   const fetchRooms = async () => {
     try {
       await axios
-        .get(`https://fivesai-backend:3000/api/rooms`)
+        .get(`https://fivesai-backend-production.up.railway.app/api/rooms`)
         .then((response) => {
           setRoomsData(response.data);
         });
