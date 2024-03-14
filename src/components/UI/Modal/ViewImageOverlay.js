@@ -20,6 +20,7 @@ const ViewImageOverlay = ({
   const [isLoading, setIsLoading] = useState(false); // New state variable for tracking loading status
 
   const onEvaluateHandler = useCallback(async () => {
+    setIsLoading(true);
     const images = [
       data.map((space) => "data:image/png;base64," + space.image),
     ];
@@ -77,7 +78,7 @@ const ViewImageOverlay = ({
       </div>
       {isLoading ? (
         // If loading, render the spinner
-        <ClipLoader color="#ffffff" loading={isLoading} size={150} />
+        <ClipLoader color="#000" loading={isLoading} size={150} />
       ) : (
         <>
           <div className={classes.imageContainer}>
