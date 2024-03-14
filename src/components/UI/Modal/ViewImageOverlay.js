@@ -18,6 +18,8 @@ const ViewImageOverlay = ({
   const [selectedImages, setSelectedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log("spaceData >>> ", spaceData);
+
   const onEvaluateHandler = useCallback(async () => {
     setIsLoading(true);
     const images = [

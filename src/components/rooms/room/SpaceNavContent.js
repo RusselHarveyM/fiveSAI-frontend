@@ -18,16 +18,16 @@ const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRefresh, setIsRefresh] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [spaceData, setSpaceData] = useState();
+  const [spaceData, setSpaceData] = useState([]);
 
   useEffect(() => {
     if (spaceId === undefined) return;
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 8000);
-    return () => clearTimeout(timer); // This will clear the timeout if the component unmounts before the 8 seconds
-  }, [spaceId]);
+    setIsLoading(() => false);
+    // const timer = setTimeout(() => {
+    //   setIsLoading(false);
+    // }, 10000);
+    // return () => clearTimeout(timer); // This will clear the timeout if the component unmounts before the 8 seconds
+  }, [spaceData]);
 
   const fetchSpaceData = useCallback(async (id) => {
     try {
@@ -66,12 +66,13 @@ const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
   useEffect(() => {
     const fetchData = async () => {
       console.log("onData id [][][]", onData[0]?.id);
+      setIsLoading(() => true);
       const data = await fetchSpaceData(onData[0]?.id);
       console.log(data, "data");
       setSpaceData(data);
     };
-    fetchData();
-  }, [isRefresh, onData[0]?.id]);
+    if (spaceId !== undefined) fetchData();
+  }, [onData[0]?.id]);
   // }, [onData[0]?.id]);
 
   const onSetNewSpaceDataHandler = async (data, selectedImages, isDelete) => {
@@ -125,7 +126,13 @@ const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
               </sup>
             </h2>
             <div className={classes.spaceTitle_buttons}>
-              <button onClick={onViewImageHandler}>View Images</button>
+              {spaceData.length > 0 ? (
+                <button onClick={onViewImageHandler}>View Images</button>
+              ) : (
+                <button onClick={onViewImageHandler} disabled>
+                  View Images
+                </button>
+              )}
             </div>
           </header>
           <div className={classes.spaceBody}>

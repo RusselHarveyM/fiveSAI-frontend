@@ -37,11 +37,15 @@ const Room = () => {
       const { score: setScore } = raw5s.result.set;
       const { score: shineScore } = raw5s.result.shine;
 
+      const sortScoreFixed = parseFloat(sortScore.toFixed(1));
+      const setScoreFixed = parseFloat(setScore.toFixed(1));
+      const shineScoreFixed = parseFloat(shineScore.toFixed(1));
+
       const newRate = {
         id: "",
-        sort: sortScore,
-        setInOrder: setScore,
-        shine: shineScore,
+        sort: sortScoreFixed,
+        setInOrder: setScoreFixed,
+        shine: shineScoreFixed,
         standarize: 0,
         sustain: 0,
         security: 0,
