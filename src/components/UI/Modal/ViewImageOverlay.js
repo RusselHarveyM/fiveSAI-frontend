@@ -78,11 +78,7 @@ const ViewImageOverlay = ({
       </div>
       {isLoading ? (
         // If loading, render the spinner
-        <div style={{ transform: "scale(3)" }}>
-          {" "}
-          {/* Increase the scale value to make the spinner thicker */}
-          <ClipLoader color="#731c23" loading={isLoading} size={40} />
-        </div>
+        <ClipLoader color="#000" loading={isLoading} size={150} />
       ) : (
         <>
           <div className={classes.imageContainer}>
