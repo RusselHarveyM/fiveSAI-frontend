@@ -1,6 +1,8 @@
 .spaceNavigation_content {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 1.8rem;
   width: 700px;
   height: 500px;
@@ -17,7 +19,7 @@
   background-color: #ffd95d;
   width: inherit;
   border-radius: 10px;
-  height: 4.2rem;
+  height: 7rem;
   justify-content: space-between;
 }
 

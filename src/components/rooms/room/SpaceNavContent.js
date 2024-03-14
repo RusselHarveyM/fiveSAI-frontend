@@ -8,16 +8,26 @@ import Backdrop from "../../UI/Modal/BackdropModal.js";
 import ViewImageOverlay from "../../UI/Modal/ViewImageOverlay.js";
 import ScoreCard from "./ScoreCard.js";
 
+import { ClipLoader } from "react-spinners";
+
 const apiBaseUrl =
   "https://fivesai-backend-production.up.railway.app/api/spaceimage";
 
-const SpaceNavContent = (props) => {
+const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
   const [spaceTotalScore, setSpaceTotalScore] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRefresh, setIsRefresh] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [spaceData, setSpaceData] = useState();
 
-  console.log("propssss >>>> ", props);
+  useEffect(() => {
+    if (spaceId === undefined) return;
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 8000);
+    return () => clearTimeout(timer); // This will clear the timeout if the component unmounts before the 8 seconds
+  }, [spaceId]);
 
   const fetchSpaceData = useCallback(async (id) => {
     try {
@@ -55,21 +65,21 @@ const SpaceNavContent = (props) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("props.onData id [][][]", props?.onData[0]?.id);
-      const data = await fetchSpaceData(props?.onData[0]?.id);
+      console.log("onData id [][][]", onData[0]?.id);
+      const data = await fetchSpaceData(onData[0]?.id);
       console.log(data, "data");
       setSpaceData(data);
     };
     fetchData();
-  }, [isRefresh, props.onData[0]?.id]);
-  // }, [props.onData[0]?.id]);
+  }, [isRefresh, onData[0]?.id]);
+  // }, [onData[0]?.id]);
 
   const onSetNewSpaceDataHandler = async (data, selectedImages, isDelete) => {
     if (isDelete) {
       data?.map(deleteSpaceData);
     }
-    console.log("props.onData", props.onData);
-    selectedImages.map((image) => uploadSpaceData(props?.onData[0]?.id, image));
+    console.log("onData", onData);
+    selectedImages.map((image) => uploadSpaceData(onData[0]?.id, image));
   };
 
   const onViewImageHandler = useCallback(() => {
@@ -89,7 +99,7 @@ const SpaceNavContent = (props) => {
           )}
           {ReactDom.createPortal(
             <ViewImageOverlay
-              scoreHandler={props.onScoreHandler}
+              scoreHandler={onScoreHandler}
               onConfirm={closeModal}
               spaceData={spaceData?.filter((sd) => sd.spaceId !== "undefined")}
               spaceDataHandler={onSetNewSpaceDataHandler}
@@ -98,29 +108,40 @@ const SpaceNavContent = (props) => {
           )}
         </>
       )}
-      <header className={classes.spaceTitle}>
-        <h2>
-          {props.onData[0]?.space.name}
-          <sup className={classes.spaceScore}>
-            {props.spaceRate[0]?.rating}/10
-          </sup>
-        </h2>
-        <div className={classes.spaceTitle_buttons}>
-          <button onClick={onViewImageHandler}>View Images</button>
+
+      {isLoading ? (
+        <div style={{ transform: "scale(3)" }}>
+          {" "}
+          {/* Increase the scale value to make the spinner thicker */}
+          <ClipLoader color="#731c23" loading={isLoading} size={40} />
         </div>
-      </header>
-      <div className={classes.spaceBody}>
-        {["sort", "setInOrder", "shine", "standarize", "sustain"].map(
-          (title) => (
-            <ScoreCard
-              key={title}
-              score={props.onData[0]?.scores?.[title]}
-              totalScore={spaceTotalScore}
-              title={title.toUpperCase()}
-            />
-          )
-        )}
-      </div>
+      ) : (
+        <>
+          <header className={classes.spaceTitle}>
+            <h2>
+              {onData[0]?.space.name}
+              <sup className={classes.spaceScore}>
+                {spaceRate[0]?.rating}/10
+              </sup>
+            </h2>
+            <div className={classes.spaceTitle_buttons}>
+              <button onClick={onViewImageHandler}>View Images</button>
+            </div>
+          </header>
+          <div className={classes.spaceBody}>
+            {["sort", "setInOrder", "shine", "standarize", "sustain"].map(
+              (title) => (
+                <ScoreCard
+                  key={title}
+                  score={onData[0]?.scores?.[title]}
+                  totalScore={spaceTotalScore}
+                  title={title.toUpperCase()}
+                />
+              )
+            )}
+          </div>
+        </>
+      )}
     </Card>
   );
 };

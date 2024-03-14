@@ -293,6 +293,7 @@ const Room = () => {
           onData={space.filter((s) => s.id === spaceId)}
           onScoreHandler={onScoreHandler}
           spaceRate={spaceRating.filter((rating) => rating.id === spaceId)}
+          spaceId={spaceId}
         />
       </div>
       <div className={classes.roomContainer_ratings}>
