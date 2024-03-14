@@ -2,41 +2,60 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #a3a3a3;
   height: 75%;
   color: #ccc;
 }
 
+.highlight {
+  background-color: inherit;
+}
+
 .okhighlight {
-  background-color: #bcffa3 !important;
+  background-color: #bcffa3;
 }
 
 .okhighlight .scoreTitle {
-  background-color: #66ce41 !important;
+  background-color: #66ce41;
 }
 
 .okhighlight .scoreTitle h3 {
-  color: #fff !important;
+  color: #fff;
 }
 
 .okhighlight h3:nth-child(2) {
-  color: #66ce41 !important;
+  color: #66ce41;
 }
 
 .warnhighlight {
-  background-color: #fff2c7 !important;
+  background-color: #fff2c7;
 }
 
 .warnhighlight .scoreTitle {
-  background-color: #ffd95e !important;
+  background-color: #ffd95e;
 }
 
 .warnhighlight .scoreTitle h3 {
-  color: #fff !important;
+  color: #fff;
 }
 
 .warnhighlight h3:nth-child(2) {
-  color: #ffd95e !important;
+  color: #ffd95e;
+}
+
+.errorhighlight {
+  background-color: #ff9e9e;
+}
+
+.errorhighlight .scoreTitle {
+  background-color: #ff4d4d;
+}
+
+.errorhighlight .scoreTitle h3 {
+  color: #fff;
+}
+
+.errorhighlight h3:nth-child(2) {
+  color: #ff4d4d;
 }
 
 .scoreTitle h3,

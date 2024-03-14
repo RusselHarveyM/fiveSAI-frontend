@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const API_KEY = "aGGzTIu56n8TOSWVfudS";
+
 const SORT = {
   wasteDisposal: 0,
   clutter: 0,
@@ -37,7 +39,7 @@ async function countDesksChairs(image) {
     method: "POST",
     url: "https://detect.roboflow.com/classroom-count-det/5",
     params: {
-      api_key: "OeSBdrSNcfGEme3a9fDf",
+      api_key: API_KEY,
     },
     data: image,
     headers: {
@@ -66,7 +68,7 @@ async function organizationCheck(image, set) {
     method: "POST",
     url: "https://detect.roboflow.com/classroom-order-seg/9",
     params: {
-      api_key: "OeSBdrSNcfGEme3a9fDf",
+      api_key: API_KEY,
     },
     data: image,
     headers: {
@@ -98,7 +100,7 @@ async function personalBelongingsCheck(image) {
     method: "POST",
     url: "https://detect.roboflow.com/classroom-3igmn/7",
     params: {
-      api_key: "OeSBdrSNcfGEme3a9fDf",
+      api_key: API_KEY,
     },
     data: image,
     headers: {
@@ -124,7 +126,7 @@ async function blueDetection(image, sort, set) {
     method: "POST",
     url: "https://detect.roboflow.com/classroom-blue-det/2",
     params: {
-      api_key: "OeSBdrSNcfGEme3a9fDf",
+      api_key: API_KEY,
     },
     data: image,
     headers: {
@@ -160,7 +162,7 @@ async function cleanlinessDetection(image, shine) {
     method: "POST",
     url: "https://detect.roboflow.com/classroom-yellow-seg/1",
     params: {
-      api_key: "OeSBdrSNcfGEme3a9fDf",
+      api_key: API_KEY,
     },
     data: image,
     headers: {
@@ -312,34 +314,125 @@ async function computeScores(s3, isClutterResults) {
   s3.sort.score = sortScore;
   s3.set.score = setScore;
   s3.shine.score = shineScore;
-
   return s3;
 }
 
-async function evaluate(images) {
-  // Create an array to store promises for each request
-  const requests = [];
+async function commentGeneration(overalls3, imageNumber) {
+  let sortComment = "";
+  let setComment = "";
+  let shineComment = "";
 
+  const SORT_CHECKLIST = {
+    wasteDisposal: "Ensure proper waste disposal",
+    clutter: "Minimize clutter",
+    cabinet: "Organize cabinets",
+    danglings: "Check for any danglings",
+    drawer: "Organize drawers",
+    shelf: "Organize shelves",
+    score: "Evaluate sorting efficiency",
+  };
+
+  const SET_CHECKLIST = {
+    organization: "Maintain overall organization",
+    ventilation: "Ensure proper ventilation",
+    aircon: "Check air conditioning",
+    exhaust: "Check exhaust systems",
+    score: "Evaluate setting effectiveness",
+  };
+
+  const SHINE_CHECKLIST = {
+    adhesives: "Remove any adhesives",
+    damage: "Repair any damages",
+    dirt: "Clean dirt",
+    dust: "Remove dust",
+    litter: "Dispose of litter",
+    smudge: "Clean smudges",
+    stain: "Remove stains",
+    score: "Evaluate cleaning standards",
+  };
+
+  // Comment for sorting
+  if (overalls3.sort.score >= 7) {
+    sortComment = "Most of the Items are sorted.";
+  } else if (overalls3.sort.score >= 5) {
+    sortComment = "Some Items are needed to be sorted.";
+  } else {
+    sortComment = "Consider improving sorting efficiency by:";
+    for (const prop in SORT_CHECKLIST) {
+      if (prop !== "score") {
+        if (overalls3.sort[prop] === 0) {
+          sortComment += `\n- ${SORT_CHECKLIST[prop]}`;
+        }
+      }
+    }
+  }
+
+  // Comment for setting
+  if (overalls3.set.score >= 7) {
+    setComment = "Great job on setting everything up!";
+  } else if (overalls3.set.score >= 5) {
+    setComment = "Nice effort in setting things!";
+  } else {
+    setComment = "Consider improving setting by:";
+    for (const prop in SET_CHECKLIST) {
+      if (prop !== "score") {
+        if (overalls3.set[prop] === 0) {
+          setComment += `\n- ${SET_CHECKLIST[prop]}`;
+        }
+      }
+    }
+  }
+
+  // Comment for shining
+  if (overalls3.shine.score >= 7) {
+    shineComment = "The place is shining brilliantly!";
+  } else if (overalls3.shine.score >= 5) {
+    shineComment = "Well done in keeping things shiny!";
+  } else {
+    shineComment = "Ensure better cleaning by:";
+    for (const prop in SHINE_CHECKLIST) {
+      if (prop !== "score") {
+        if (overalls3.shine[prop] === 0) {
+          shineComment += `\n- ${SHINE_CHECKLIST[prop]}`;
+        }
+      }
+    }
+  }
+
+  return {
+    sort: sortComment,
+    set: setComment,
+    shine: shineComment,
+  };
+}
+
+async function evaluate(images) {
   const s3Results = [];
 
+  let overalls3 = {
+    sort: { ...SORT },
+    set: { ...SET },
+    shine: { ...SHINE },
+  };
+
+  let organizationCountImage = 0;
+  let length = images[0].length;
+
   // Loop through the images array
-  for (let index = 0; index < images[0].length; index++) {
+  for (let index = 0; index < length; index++) {
     let sort = { ...SORT };
     let set = { ...SET };
     let shine = { ...SHINE };
 
     const image = images[0][index];
-    // const delay = index * 2000;
 
     console.log("index {}{}{}{}{}{}", index);
 
-    // Wait for the delay
-    // await new Promise((resolve) => setTimeout(resolve, delay));
-
-    // Send the request and store the promise in the requests array
     const count = await countDesksChairs(image);
+
     if (count.count >= 10) {
       await organizationCheck(image, set);
+      organizationCountImage++;
     }
     await blueDetection(image, sort, set);
     const pb_result = await personalBelongingsCheck(image);
@@ -350,12 +443,33 @@ async function evaluate(images) {
       set: set,
       shine: shine,
     };
+
     const s3Result = await computeScores(s3, ic_result);
     s3Results.push(s3Result);
+    // Calculate overall scores and add them to overalls3
+    for (let prop in sort) {
+      overalls3.sort[prop] += sort[prop];
+    }
+    for (let prop in set) {
+      overalls3.set[prop] += set[prop];
+    }
+    for (let prop in shine) {
+      overalls3.shine[prop] += shine[prop];
+    }
   }
+  overalls3.sort.score /= length;
+  overalls3.sort.clutter /= length;
+
+  overalls3.set.score /= length;
+  overalls3.set.organization /=
+    organizationCountImage !== 0 ? organizationCountImage : 0;
+
+  overalls3.shine.score /= length;
+
+  const comments = await commentGeneration(overalls3, length);
+
   console.log("srResultsssss >>>>> ", s3Results);
-  // Return a promise that resolves when all requests are complete
-  return s3Results;
+  return { result: overalls3, comment: comments };
 }
 
 export default evaluate;

@@ -2,8 +2,14 @@ import classes from "./ScoreCard.module.css";
 import Card from "../../UI/Card/Card";
 
 const ScoreCard = ({ score, totalScore, title }) => {
-  const scoreClass =
-    score >= 8 ? classes.okhighlight : score >= 5 ? classes.warnhighlight : "";
+  let scoreClass = "";
+  if (score >= 8) {
+    scoreClass = classes.okhighlight;
+  } else if (score >= 4) {
+    scoreClass = classes.warnhighlight;
+  } else if (score > 0) {
+    scoreClass = classes.errorhighlight;
+  }
   return (
     <Card className={scoreClass}>
       <div className={classes.scoreTitle}>

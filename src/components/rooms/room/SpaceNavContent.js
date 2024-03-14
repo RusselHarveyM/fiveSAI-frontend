@@ -19,9 +19,12 @@ const SpaceNavContent = (props) => {
 
   console.log("propssss >>>> ", props);
 
+  useEffect(() => {}, [props.raw5sData]);
+
   const fetchSpaceData = useCallback(async (id) => {
     try {
       const response = await axios.get(`${apiBaseUrl}/get/${id}`);
+      console.log("space image data :::::", response.data);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -33,7 +36,7 @@ const SpaceNavContent = (props) => {
     try {
       console.log("data > ", data);
       await axios.delete(`${apiBaseUrl}/delete/${data.id}`);
-      setIsRefresh(!isRefresh);
+      setIsRefresh((prev) => !prev);
     } catch (error) {
       console.log(error);
     }
@@ -46,7 +49,7 @@ const SpaceNavContent = (props) => {
       console.log("id 111", id);
       await axios.post(`${apiBaseUrl}/upload/${id}`, formData);
       console.log("uploading");
-      setIsRefresh(!isRefresh);
+      setIsRefresh((prev) => !prev);
     } catch (error) {
       console.log(error);
     }
@@ -54,12 +57,14 @@ const SpaceNavContent = (props) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("props.onData id [][][]", props?.onData[0]?.id);
       const data = await fetchSpaceData(props?.onData[0]?.id);
       console.log(data, "data");
       setSpaceData(data);
     };
     fetchData();
   }, [isRefresh, props.onData[0]?.id]);
+  // }, [props.onData[0]?.id]);
 
   const onSetNewSpaceDataHandler = async (data, selectedImages, isDelete) => {
     if (isDelete) {
@@ -87,7 +92,8 @@ const SpaceNavContent = (props) => {
           {ReactDom.createPortal(
             <ViewImageOverlay
               scoreHandler={props.onScoreHandler}
-              spaceData={spaceData}
+              onConfirm={closeModal}
+              spaceData={spaceData?.filter((sd) => sd.spaceId !== "undefined")}
               spaceDataHandler={onSetNewSpaceDataHandler}
             />,
             document.getElementById("overlay-root")

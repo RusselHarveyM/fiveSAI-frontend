@@ -3,13 +3,21 @@ import classes from "./ViewImageOverlay.module.css";
 import evaluate from "../../rooms/room/evaluate";
 import addImage from "../../../static/images/addImage.png";
 
-const ViewImageOverlay = ({ spaceData, scoreHandler, spaceDataHandler }) => {
+import { ClipLoader } from "react-spinners";
+
+const ViewImageOverlay = ({
+  spaceData,
+  scoreHandler,
+  spaceDataHandler,
+  onConfirm,
+}) => {
   const [isEdit, setIsEdit] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
-  const [data, setData] = useState(spaceData);
+  const [data, setData] = useState([...spaceData]);
   const [tempData] = useState(data);
   const [deletedData, setDeletedData] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // New state variable for tracking loading status
 
   const onEvaluateHandler = useCallback(async () => {
     const images = [
@@ -18,6 +26,8 @@ const ViewImageOverlay = ({ spaceData, scoreHandler, spaceDataHandler }) => {
 
     const result = await evaluate(images);
     scoreHandler(result);
+    onConfirm();
+    setIsLoading(false);
   }, [data, scoreHandler]);
 
   const onEditHandler = () => {
@@ -34,6 +44,7 @@ const ViewImageOverlay = ({ spaceData, scoreHandler, spaceDataHandler }) => {
       isDelete
     );
     setIsEdit(!isEdit);
+    // onConfirm();
   };
 
   const handleFileChange = (event) => {
@@ -56,6 +67,7 @@ const ViewImageOverlay = ({ spaceData, scoreHandler, spaceDataHandler }) => {
     setDeletedData([]);
     setIsDelete(false);
     setIsEdit(!isEdit);
+    onConfirm();
   };
 
   return (
@@ -63,76 +75,84 @@ const ViewImageOverlay = ({ spaceData, scoreHandler, spaceDataHandler }) => {
       <div className={classes.container_header}>
         <h2>Images</h2>
       </div>
-
-      <div className={classes.imageContainer}>
-        {data?.map((image) => (
-          <div>
-            <img
-              className={classes.image}
-              src={`data:image/png;base64,${image.image}`}
-              alt={image.name}
-              key={image.id}
-            />
+      {isLoading ? (
+        // If loading, render the spinner
+        <ClipLoader color="#ffffff" loading={isLoading} size={150} />
+      ) : (
+        <>
+          <div className={classes.imageContainer}>
+            {data?.map((image) => (
+              <div key={image.id}>
+                <img
+                  className={classes.image}
+                  src={`data:image/png;base64,${image.image}`}
+                  alt={image.name}
+                />
+                {isEdit ? (
+                  <button
+                    id={image.id}
+                    className={classes.deleteImageBtn}
+                    onClick={onDeleteImageHandler}
+                  >
+                    X
+                  </button>
+                ) : (
+                  ""
+                )}
+              </div>
+            ))}
+            {selectedImages.map((url, index) => (
+              <img
+                key={index}
+                src={URL.createObjectURL(url)}
+                alt="Selected"
+                className={`${classes.image} ${isEdit ? classes.newImage : ""}`}
+              />
+            ))}
             {isEdit ? (
-              <button
-                id={image.id}
-                className={classes.deleteImageBtn}
-                onClick={onDeleteImageHandler}
-              >
-                X
-              </button>
+              <label htmlFor="imageUpload" className={classes.uploadImage}>
+                <img src={addImage} alt="upload" />
+                <input
+                  type="file"
+                  name="file"
+                  id="imageUpload"
+                  accept="image/png, image/jpeg"
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                  multiple
+                />
+              </label>
             ) : (
               ""
             )}
           </div>
-        ))}
-        {selectedImages.map((url, index) => (
-          <img
-            key={index}
-            src={URL.createObjectURL(url)}
-            alt="Selected"
-            className={`${classes.image} ${isEdit ? classes.newImage : ""}`}
-          />
-        ))}
-        {isEdit ? (
-          <label htmlFor="imageUpload" className={classes.uploadImage}>
-            <img src={addImage} alt="upload" />
-            <input
-              type="file"
-              name="file"
-              id="imageUpload"
-              accept="image/png, image/jpeg"
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-              multiple
-            />
-          </label>
-        ) : (
-          ""
-        )}
-      </div>
-      <div className={classes.buttonsContainer}>
-        <button className={classes.evaluateBtn} onClick={onEvaluateHandler}>
-          Evaluate
-        </button>
-        {isEdit ? (
-          <div className={classes.editBtnContainer}>
-            <button
-              className={classes.cancelBtn}
-              onClick={onCancelButtonHandler}
-            >
-              Cancel
+          <div className={classes.buttonsContainer}>
+            <button className={classes.evaluateBtn} onClick={onEvaluateHandler}>
+              Evaluate
             </button>
-            <button className={classes.confirmBtn} onClick={onConfirmHandler}>
-              Confirm
-            </button>
+            {isEdit ? (
+              <div className={classes.editBtnContainer}>
+                <button
+                  className={classes.cancelBtn}
+                  onClick={onCancelButtonHandler}
+                >
+                  Cancel
+                </button>
+                <button
+                  className={classes.confirmBtn}
+                  onClick={onConfirmHandler}
+                >
+                  Confirm
+                </button>
+              </div>
+            ) : (
+              <button className={classes.editBtn} onClick={onEditHandler}>
+                Edit Images
+              </button>
+            )}
           </div>
-        ) : (
-          <button className={classes.editBtn} onClick={onEditHandler}>
-            Edit Images
-          </button>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };

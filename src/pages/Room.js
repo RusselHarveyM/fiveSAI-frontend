@@ -15,29 +15,35 @@ const Room = () => {
   const [overallRating, setOverallRating] = useState(0.0);
   const [spaceRating, setSpaceRating] = useState([]);
   const [remark, setRemark] = useState("NOT CALIBRATED");
-  const [isRefreshSNContent, setIsRefreshSNContent] = useState(false); // for refreshing SpaceNavContent.js
-  const [rate, setRate] = useState({});
+  const [raw5sData, setRaw5sData] = useState(null);
+
+  useEffect(() => {
+    if (overallRating >= 1 && overallRating <= 4) {
+      setRemark("Bad");
+    } else if (overallRating >= 5 && overallRating <= 7) {
+      setRemark("Good");
+    } else if (overallRating >= 8 && overallRating <= 10) {
+      setRemark("Excellent");
+    }
+  }, [overallRating]);
 
   const params = useParams();
 
-  useEffect(() => {
-    setOverallRating(() => {
-      let totalScore = 0;
-      spaceRating?.forEach((current) => {
-        totalScore += current.rating;
-      });
-      console.log("current spaceRating >>>.", spaceRating);
-      return (totalScore / spaceRating.length).toPrecision(2);
-    });
-  }, [spaceRating]);
-
   const onScoreHandler = useCallback(
     async (raw5s) => {
-      let newRate = {
+      console.log("raw5s >>>{{{{", raw5s);
+      setRaw5sData(raw5s);
+
+      const { sort, set, shine } = raw5s.comment;
+      const { score: sortScore } = raw5s.result.sort;
+      const { score: setScore } = raw5s.result.set;
+      const { score: shineScore } = raw5s.result.shine;
+
+      const newRate = {
         id: "",
-        sort: 0,
-        setInOrder: 0,
-        shine: 0,
+        sort: sortScore,
+        setInOrder: setScore,
+        shine: shineScore,
         standarize: 0,
         sustain: 0,
         security: 0,
@@ -45,70 +51,118 @@ const Room = () => {
         spaceId: spaceId,
       };
 
-      raw5s.forEach((s3) => {
-        newRate.sort += s3.sort.score;
-        newRate.setInOrder += s3.set.score;
-        newRate.shine += s3.shine.score;
-      });
-      newRate.sort = Math.round((newRate.sort / raw5s.length) * 10) / 10;
-      newRate.setInOrder =
-        Math.round((newRate.setInOrder / raw5s.length) * 10) / 10;
-      newRate.shine = Math.round((newRate.shine / raw5s.length) * 10) / 10;
-
-      setRate(newRate);
-
-      const createNewComment = (ratingId) => ({
-        id: "",
-        sort: "",
-        setInOrder: "",
-        shine: "",
-        standarize: "",
-        sustain: "",
-        security: "",
-        isActive: true,
-        ratingId,
-      });
-
       console.log("space >>>{{{{", space);
 
-      if (space[0].scores?.length == 0 && space[0].comments?.length == 0) {
-        try {
+      try {
+        let ratingId = "";
+        let commentId = "";
+
+        if (
+          (space[0].scores?.length == 0 && space[0].comments?.length == 0) ||
+          (space[0]?.scores == undefined && space[0]?.comments == undefined)
+        ) {
           const resRate = await axios.post(
             "https://fivesai-backend-production.up.railway.app/api/ratings",
             newRate
           );
 
           console.log("resRate data >>>> ", resRate.data);
+          ratingId = resRate.data;
 
-          const newComment = createNewComment(resRate.data);
+          const newComment = {
+            id: "",
+            sort: sort,
+            setInOrder: set,
+            shine: shine,
+            standarize: "",
+            sustain: "",
+            security: "",
+            isActive: true,
+            ratingId,
+          };
 
           const resComment = await axios.post(
             "https://fivesai-backend-production.up.railway.app/api/comment",
             newComment
           );
-        } catch (error) {
-          console.error(error);
-        }
-      } else {
-        try {
+        } else {
+          const spaceTemp = space.filter((sp) => sp.id === spaceId);
+
+          console.log("space 22222 >>>> ", spaceTemp);
+
+          const rateId = spaceTemp[0]?.scores?.id;
+
+          newRate.id = rateId;
+
+          console.log("newRate >>>> ", newRate);
+          console.log("spaceId [][][][][]>>>> ", spaceId);
+
           const resRate = await axios.put(
-            `https://fivesai-backend-production.up.railway.app/api/ratings/${space[0].scores?.id}`,
+            `https://fivesai-backend-production.up.railway.app/api/ratings/${rateId}`,
             newRate
           );
 
-          const newComment = createNewComment(resRate.data);
-          const resComment = await axios.put(
-            `https://fivesai-backend-production.up.railway.app/api/comment/${space[0].scores?.id}`,
+          ratingId = resRate.data;
+          commentId = space[0]?.comments?.id;
+
+          const newComment = {
+            id: commentId,
+            sort: sort,
+            setInOrder: set,
+            shine: shine,
+            standarize: "",
+            sustain: "",
+            security: "",
+            isActive: true,
+            ratingId,
+          };
+
+          await axios.put(
+            `https://fivesai-backend-production.up.railway.app/api/comment/${commentId}`,
             newComment
           );
-        } catch (error) {
-          console.error(error);
         }
+      } catch (error) {
+        console.error(error);
       }
-      setIsRefreshSNContent((prevState) => !prevState);
     },
     [space, spaceId]
   );
+
+  const populateSpaceRating = async () => {
+    try {
+      const response = await axios.get(
+        "https://fivesai-backend-production.up.railway.app/api/ratings"
+      );
+      const ratings = response.data;
+      const spaceRatings = ratings.map((rating) => ({
+        id: rating.spaceId,
+        rating:
+          (Math.round((rating.sort + rating.setInOrder + rating.shine) / 3) *
+            10) /
+          10,
+      }));
+
+      setSpaceRating(spaceRatings);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    populateSpaceRating();
+  }, [spaceId]);
+
+  useEffect(() => {
+    // Calculate the overall rating whenever spaceRating changes
+    const overallRating =
+      Math.round(
+        (spaceRating.reduce((acc, curr) => acc + curr.rating, 0) /
+          spaceRating.length) *
+          10
+      ) / 10;
+    setOverallRating(overallRating);
+  }, [spaceRating]);
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -130,8 +184,6 @@ const Room = () => {
         const response = await axios.get(
           `https://fivesai-backend-production.up.railway.app/api/space`
         );
-        console.log("reponse >>>", response);
-        console.log("roomData>>>", roomData);
         setSpaces(() => {
           return response.data.filter((space) => space.roomId === roomData?.id);
         });
@@ -182,38 +234,6 @@ const Room = () => {
             comment.ratingId == (scores.length > 0 ? scores[0].id : null)
         );
 
-        if (scores.length > 0) {
-          const properties = [
-            "security",
-            "setInOrder",
-            "shine",
-            "sort",
-            "standarize",
-            "sustain",
-          ];
-          let totalScores = 0;
-
-          properties.forEach((property) => {
-            totalScores += scores[0][property];
-          });
-
-          let score = totalScores / 3;
-          let roundedScore = Math.round(score * 10) / 10;
-
-          console.log("tt score", roundedScore);
-
-          setSpaceRating((prevRatings) => [
-            ...prevRatings,
-            { id: space.id, rating: roundedScore },
-          ]);
-        } else {
-          console.log("fail");
-          setSpaceRating((prevRatings) => [
-            ...prevRatings,
-            { id: space.id, rating: 0 },
-          ]);
-        }
-
         setSpace((prevSpace) => {
           const newSpace = prevSpace.filter((sp) => sp.id !== space.id);
           console.log("sp spsp >>> ", newSpace);
@@ -241,6 +261,8 @@ const Room = () => {
   const onSpaceNavHandler = useCallback(async (res) => {
     setSpaceId(res.target.id);
   }, []);
+
+  console.log("space rating >>>> ", spaceRating);
 
   return (
     <div className={classes.roomContainer}>
@@ -270,11 +292,19 @@ const Room = () => {
           onData={space.filter((s) => s.id === spaceId)}
           onScoreHandler={onScoreHandler}
           spaceRate={spaceRating.filter((rating) => rating.id === spaceId)}
-          // overallScore={onSetTotalScoreHandler}
+          raw5sData={raw5sData} // Pass raw5sData as a prop
         />
       </div>
       <div className={classes.roomContainer_ratings}>
-        <div className={classes.roomContainer_ratings_rating}>
+        <div
+          className={`${classes.roomContainer_ratings_rating} ${
+            remark === "Bad"
+              ? classes.red
+              : remark === "Good"
+              ? classes.yellow
+              : classes.green
+          }`}
+        >
           <h1>{overallRating}</h1>
           <h3>{remark}</h3>
         </div>
