@@ -46,6 +46,7 @@ const ViewImageOverlay = ({
       isDelete
     );
     setIsEdit((prevIsEdit) => !prevIsEdit);
+    // onConfirm();
   }, [deletedData, selectedImages, isDelete, spaceDataHandler]);
 
   const handleFileChange = useCallback((event) => {

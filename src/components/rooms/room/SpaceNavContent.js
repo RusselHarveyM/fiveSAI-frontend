@@ -23,10 +23,6 @@ const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
   useEffect(() => {
     if (spaceId === undefined) return;
     setIsLoading(() => false);
-    // const timer = setTimeout(() => {
-    //   setIsLoading(false);
-    // }, 10000);
-    // return () => clearTimeout(timer); // This will clear the timeout if the component unmounts before the 8 seconds
   }, [spaceData]);
 
   const fetchSpaceData = useCallback(async (id) => {
@@ -72,7 +68,7 @@ const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
       setSpaceData(data);
     };
     if (spaceId !== undefined) fetchData();
-  }, [onData[0]?.id]);
+  }, [isRefresh, onData[0]?.id]);
   // }, [onData[0]?.id]);
 
   const onSetNewSpaceDataHandler = async (data, selectedImages, isDelete) => {

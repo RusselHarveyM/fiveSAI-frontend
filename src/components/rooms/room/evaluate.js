@@ -190,8 +190,6 @@ async function cleanlinessDetection(image, shine) {
 
 // Define a function to check if a desk or chair is cluttered based on personal belongings
 function isCluttered(dcObjects, pbObjects) {
-  console.log("dcObjects [][][][", dcObjects);
-  console.log("pbObjects [][][][", pbObjects);
   // Create an array to store clutteredness status for each object
   let clutteredStatus = [];
 
@@ -212,25 +210,31 @@ function isCluttered(dcObjects, pbObjects) {
       isClutter: false,
     };
 
-    // Assuming object is the detected desk or chair
+    // Calculate the center of the bounding box
+    const centerX = object.x + object.width / 2;
+    const centerY = object.y + object.height / 2;
+
+    // Calculate the half of the diagonal of the bounding box
+    const halfDiagonal =
+      Math.sqrt(Math.pow(object.width, 2) + Math.pow(object.height, 2)) / 2;
+
     // Count the number of personal belongings within the bounding box
     let numPersonalBelongings = 0;
     for (let i = 0; i < object.points.length; i++) {
-      // Assuming each point represents the coordinates of a personal belonging
-      // Check if the point is within the bounding box of the desk or chair
+      // Calculate the Euclidean distance between the center of the bounding box and the point
       let point = object.points[i];
-      if (
-        point.x >= object.x &&
-        point.x <= object.x + object.width &&
-        point.y >= object.y &&
-        point.y <= object.y + object.height
-      ) {
+      const distance = Math.sqrt(
+        Math.pow(point.x - centerX, 2) + Math.pow(point.y - centerY, 2)
+      );
+
+      // Check if the distance is less than or equal to the half of the diagonal
+      if (distance <= halfDiagonal) {
         numPersonalBelongings++;
       }
     }
 
     // Define a threshold for clutteredness (you can adjust this threshold based on your requirements)
-    const clutterThreshold = 1; // For example, if there are more than 5 personal belongings, consider it cluttered
+    const clutterThreshold = 2; // For example, if there are more than 2 personal belongings, consider it cluttered
 
     // Check if the number of personal belongings exceeds the threshold
     if (numPersonalBelongings >= clutterThreshold) {
