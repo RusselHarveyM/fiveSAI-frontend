@@ -333,7 +333,7 @@ async function commentGeneration(overalls3, imageNumber) {
   };
 
   const SET_CHECKLIST = {
-    organization: "Maintain overall organization",
+    organization: "Maintain overall organization like the desks and chairs",
     ventilation: "Ensure proper ventilation",
     aircon: "Check air conditioning",
     exhaust: "Check exhaust systems",
@@ -376,9 +376,7 @@ async function commentGeneration(overalls3, imageNumber) {
     setComment = "Consider improving setting by:";
     for (const prop in SET_CHECKLIST) {
       if (prop !== "score") {
-        if (overalls3.set[prop] === 0) {
-          setComment += `\n- ${SET_CHECKLIST[prop]}`;
-        }
+        setComment += `\n- ${SET_CHECKLIST[prop]}`;
       }
     }
   }

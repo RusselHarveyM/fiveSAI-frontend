@@ -15,14 +15,14 @@ const Room = () => {
   const [overallRating, setOverallRating] = useState(0.0);
   const [spaceRating, setSpaceRating] = useState([]);
   const [remark, setRemark] = useState("NOT CALIBRATED");
-  const [raw5sData, setRaw5sData] = useState(null);
+  const [raw5s, setRaw5s] = useState(null);
 
   useEffect(() => {
     if (overallRating >= 1 && overallRating <= 4) {
       setRemark("Bad");
-    } else if (overallRating >= 5 && overallRating <= 7) {
+    } else if (overallRating >= 4.1 && overallRating <= 7) {
       setRemark("Good");
-    } else if (overallRating >= 8 && overallRating <= 10) {
+    } else if (overallRating >= 7.1 && overallRating <= 10) {
       setRemark("Excellent");
     }
   }, [overallRating]);
@@ -32,7 +32,8 @@ const Room = () => {
   const onScoreHandler = useCallback(
     async (raw5s) => {
       console.log("raw5s >>>{{{{", raw5s);
-      setRaw5sData(raw5s);
+
+      setRaw5s(raw5s); // update raw5s state
 
       const { sort, set, shine } = raw5s.comment;
       const { score: sortScore } = raw5s.result.sort;
@@ -126,7 +127,7 @@ const Room = () => {
         console.error(error);
       }
     },
-    [space, spaceId]
+    [space, spaceId, raw5s]
   );
 
   const populateSpaceRating = async () => {
@@ -292,7 +293,6 @@ const Room = () => {
           onData={space.filter((s) => s.id === spaceId)}
           onScoreHandler={onScoreHandler}
           spaceRate={spaceRating.filter((rating) => rating.id === spaceId)}
-          raw5sData={raw5sData} // Pass raw5sData as a prop
         />
       </div>
       <div className={classes.roomContainer_ratings}>

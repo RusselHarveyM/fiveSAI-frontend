@@ -19,8 +19,6 @@ const SpaceNavContent = (props) => {
 
   console.log("propssss >>>> ", props);
 
-  useEffect(() => {}, [props.raw5sData]);
-
   const fetchSpaceData = useCallback(async (id) => {
     try {
       const response = await axios.get(`${apiBaseUrl}/get/${id}`);
