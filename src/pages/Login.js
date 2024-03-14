@@ -8,23 +8,19 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
-    const [userData, setUserData] = useState([]);
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchUsers = async () => {
             try {
-                await axios
-                    .get("https://fivesai-backend-production.up.railway.app/api/user/65f30f7eee73c50b279706ca/user")
-                    .then((response) => {
-                        console.log(response.body);
-                        setUserData(response.data);
-                    });
+                const response = await axios.get("https://fivesai-backend-production.up.railway.app/api/user");
+                setUsers(response.data);
             } catch (error) {
-                console.log(error);
+                console.error('Error fetching users:', error);
             }
         };
-        fetchData();
+
+        fetchUsers();
     }, []);
 
     const handleLogin = async (e) => {
@@ -36,14 +32,22 @@ const Login = () => {
         }
 
         try {
-            if (username === userData.username && password === userData.password) {
-                navigate('/dashboard');
-            }
-            else {
-                setError('Invalid username and password.');
+            const response = await axios.get("https://fivesai-backend-production.up.railway.app/api/user");
+            const user = response.data.find(user => user.username === username && user.password === password);
+
+            if (user) {
+                console.log("Logged in user:", user);
+                if (user.role === 'admin' || user.role === 'user') {
+                    navigate('/dashboard', { state: { userRole: user.role } }); // Pass user role as state
+                } else {
+                    setError('Invalid role. Only admin or user can login.');
+                }
+            } else {
+                setError('Invalid username or password. Please try again.');
             }
         } catch (error) {
-            setError('Invalid username or password. Please try again.');
+            setError('Error logging in. Please try again.');
+            console.error('Error logging in:', error);
         }
     };
 
