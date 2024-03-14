@@ -38,9 +38,9 @@ const Login = () => {
             if (user) {
                 console.log("Logged in user:", user);
                 if (user.role === 'admin' || user.role === 'user') {
-                    navigate('/dashboard', { state: { userRole: user.role } }); // Pass user role as state
+                    navigate('/dashboard', { state: { userRole: user.role } });
                 } else {
-                    setError('Invalid role. Only admin or user can login.');
+                    setError('Invalid role. Only admin or user can login.'); // can be modified, since string it could be any
                 }
             } else {
                 setError('Invalid username or password. Please try again.');
