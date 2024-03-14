@@ -300,20 +300,25 @@ async function computeScores(s3, isClutterResults) {
 
   const setScore = ((organizationScore + atLeastOneHVACScore) / 10) * 10;
 
-  //shine score
+  // shine score
+  // const totalCount = Object.values(shine).reduce((total, c) => total + c, 0);
+  // const maxCount = Math.max(...Object.values(shine));
 
-  const totalCount = Object.values(shine).reduce((total, c) => total + c, 0);
-  const maxCount = Math.max(...Object.values(shine));
+  // Calculate the score based on the distance from zero
+  const shineScore = Object.values(shine).reduce(
+    (total, c) => total + (1 - c),
+    0
+  );
 
-  // Handle case where totalCount is 0 to avoid division by zero
-  const shineScore =
-    totalCount === 0
-      ? 0
-      : (totalCount / (maxCount * Object.keys(shine).length)) * 10;
+  // Normalize the score to be between 0 and 1
+  const normalizedShineScore = shineScore / Object.keys(shine).length;
+
+  // Scale the score to be between 1 and 10
+  const scaledShineScore = normalizedShineScore * 9 + 1;
 
   s3.sort.score = sortScore;
   s3.set.score = setScore;
-  s3.shine.score = shineScore;
+  s3.shine.score = scaledShineScore;
   return s3;
 }
 

@@ -15,7 +15,6 @@ const Room = () => {
   const [overallRating, setOverallRating] = useState(0.0);
   const [spaceRating, setSpaceRating] = useState([]);
   const [remark, setRemark] = useState("NOT CALIBRATED");
-  const [raw5s, setRaw5s] = useState(null);
 
   useEffect(() => {
     if (overallRating >= 1 && overallRating <= 4) {
@@ -32,8 +31,6 @@ const Room = () => {
   const onScoreHandler = useCallback(
     async (raw5s) => {
       console.log("raw5s >>>{{{{", raw5s);
-
-      setRaw5s(raw5s); // update raw5s state
 
       const { sort, set, shine } = raw5s.comment;
       const { score: sortScore } = raw5s.result.sort;
@@ -82,7 +79,7 @@ const Room = () => {
             ratingId,
           };
 
-          const resComment = await axios.post(
+          await axios.post(
             "https://fivesai-backend-production.up.railway.app/api/comment",
             newComment
           );
@@ -127,7 +124,7 @@ const Room = () => {
         console.error(error);
       }
     },
-    [space, spaceId, raw5s]
+    [space, spaceId]
   );
 
   const populateSpaceRating = async () => {
@@ -156,14 +153,18 @@ const Room = () => {
 
   useEffect(() => {
     // Calculate the overall rating whenever spaceRating changes
+    const roomSpaceRatings = spaceRating.filter(
+      (rating) =>
+        spaces.find((space) => space.id === rating.id)?.roomId === params.roomId
+    );
     const overallRating =
       Math.round(
-        (spaceRating.reduce((acc, curr) => acc + curr.rating, 0) /
-          spaceRating.length) *
+        (roomSpaceRatings.reduce((acc, curr) => acc + curr.rating, 0) /
+          roomSpaceRatings.length) *
           10
       ) / 10;
-    setOverallRating(overallRating);
-  }, [spaceRating]);
+    setOverallRating(() => overallRating);
+  }, [spaceRating, spaces, params.roomId]);
 
   useEffect(() => {
     const fetchRoomData = async () => {

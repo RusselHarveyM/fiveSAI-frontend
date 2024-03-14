@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import classes from "./ViewImageOverlay.module.css";
 import evaluate from "../../rooms/room/evaluate";
 import addImage from "../../../static/images/addImage.png";
@@ -14,10 +14,9 @@ const ViewImageOverlay = ({
   const [isEdit, setIsEdit] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [data, setData] = useState([...spaceData]);
-  const [tempData] = useState(data);
   const [deletedData, setDeletedData] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false); // New state variable for tracking loading status
+  const [isLoading, setIsLoading] = useState(false);
 
   const onEvaluateHandler = useCallback(async () => {
     setIsLoading(true);
@@ -31,45 +30,69 @@ const ViewImageOverlay = ({
     setIsLoading(false);
   }, [data, scoreHandler]);
 
-  const onEditHandler = () => {
+  const onEditHandler = useCallback(() => {
     setDeletedData([]);
     setSelectedImages([]);
-    setIsEdit(!isEdit);
+    setIsEdit((prevIsEdit) => !prevIsEdit);
     setIsDelete(false);
-  };
+  }, []);
 
-  const onConfirmHandler = () => {
+  const onConfirmHandler = useCallback(() => {
     spaceDataHandler(
-      deletedData ? deletedData : [],
-      selectedImages ? selectedImages : [],
+      deletedData.length > 0 ? deletedData : [],
+      selectedImages.length > 0 ? selectedImages : [],
       isDelete
     );
-    setIsEdit(!isEdit);
-    // onConfirm();
-  };
+    setIsEdit((prevIsEdit) => !prevIsEdit);
+  }, [deletedData, selectedImages, isDelete, spaceDataHandler]);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = useCallback((event) => {
     const files = Array.from(event.target.files);
     setSelectedImages(files);
-  };
+  }, []);
 
-  const onDeleteImageHandler = (event) => {
-    console.log("delete event ???", event);
-    const delData = data.filter((image) => image.id === event.target.id);
-    console.log("delete event after???", delData);
+  const onDeleteImageHandler = useCallback(
+    (event) => {
+      const delData = data.filter((image) => image.id === event.target.id);
+      setDeletedData((prevData) => [...prevData, ...delData]);
+      setData((prevData) =>
+        prevData.filter((image) => image.id !== event.target.id)
+      );
+      setIsDelete(true);
+    },
+    [data]
+  );
 
-    setDeletedData((prevData) => [...prevData, ...delData]);
-    setData(() => data.filter((image) => image.id !== event.target.id));
-    setIsDelete(true);
-  };
-
-  const onCancelButtonHandler = () => {
-    setData(tempData);
+  const onCancelButtonHandler = useCallback(() => {
+    setData(spaceData);
     setDeletedData([]);
     setIsDelete(false);
-    setIsEdit(!isEdit);
+    setIsEdit((prevIsEdit) => !prevIsEdit);
     onConfirm();
-  };
+  }, [spaceData, onConfirm]);
+
+  const renderImages = useMemo(
+    () =>
+      data.map((image) => (
+        <div key={image.id}>
+          <img
+            className={classes.image}
+            src={`data:image/png;base64,${image.image}`}
+            alt={image.name}
+          />
+          {isEdit && (
+            <button
+              id={image.id}
+              className={classes.deleteImageBtn}
+              onClick={onDeleteImageHandler}
+            >
+              X
+            </button>
+          )}
+        </div>
+      )),
+    [data, isEdit, onDeleteImageHandler]
+  );
 
   return (
     <div className={classes.container}>
