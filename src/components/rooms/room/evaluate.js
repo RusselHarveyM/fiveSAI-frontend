@@ -234,7 +234,7 @@ function isCluttered(dcObjects, pbObjects) {
     }
 
     // Define a threshold for clutteredness (you can adjust this threshold based on your requirements)
-    const clutterThreshold = 2; // For example, if there are more than 2 personal belongings, consider it cluttered
+    const clutterThreshold = 1; // For example, if there are more than 2 personal belongings, consider it cluttered
 
     // Check if the number of personal belongings exceeds the threshold
     if (numPersonalBelongings >= clutterThreshold) {
