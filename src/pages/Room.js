@@ -243,9 +243,10 @@ const Room = () => {
           ?.filter((score) => score.spaceId == scoreId)
           ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
           ?.slice(0, 1);
+        console.log(">>>score [][] <<<", score);
 
         const comment = data?.comments
-          ?.filter((comment) => comment.ratingId == score[0].id)
+          ?.filter((comment) => comment.ratingId == score[0]?.id)
           ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
           ?.slice(0, 1);
 
@@ -254,13 +255,14 @@ const Room = () => {
 
       const calculateSpaceRate = (score) => {
         return (
-          (Math.round((score.sort + score.setInOrder + score.shine) / 3) * 10) /
+          (Math.round((score?.sort + score?.setInOrder + score?.shine) / 3) *
+            10) /
           10
         );
       };
-      console.log(">>>data.length <<<", data.length);
+      console.log(">>>data.length <<<", data);
 
-      if (data.scores.length > 0) {
+      if (data?.scores?.length > 0) {
         const { score, comment } = getScoreAndComment(data, spaceId);
         console.log(">>>score <<<", score);
         const spaceRate = calculateSpaceRate(score[0]);
@@ -277,6 +279,8 @@ const Room = () => {
         const score = data.scores;
         const comment = data.comments;
         const spaceRate = calculateSpaceRate(score);
+        console.log(">>>score2<<<", score);
+
         filteredSpace = spaces.filter((sp) => sp.id == spaceId);
 
         newSpace = {
