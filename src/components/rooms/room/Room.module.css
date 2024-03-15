@@ -130,6 +130,10 @@
   font-size: 4rem;
 }
 
+.roomContainer_ratings_rating h3 {
+  text-align: center;
+}
+
 .red {
   background-color: red;
 }
