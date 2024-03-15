@@ -136,6 +136,8 @@ const Room = () => {
               index === self.findIndex((r) => r.spaceId === rating.spaceId) // Filter out the first occurrence of each spaceId
           );
 
+        console.log("latestSpaceRatings response", latestSpaceRatings);
+
         const spaceRatings = latestSpaceRatings.map((rating) => ({
           id: rating.spaceId,
           rating:
@@ -143,10 +145,10 @@ const Room = () => {
               10) /
             10,
         }));
+        console.log("spaceRatings response", spaceRatings);
 
         setSpaceRating(() => spaceRatings);
         setData(() => ({ ...newData }));
-        setIsLoading(() => false);
       } catch (error) {
         console.log(error);
         const newRate = {
@@ -178,7 +180,7 @@ const Room = () => {
           comments: newComment,
         };
         setData(() => ({ ...newData }));
-
+      } finally {
         setIsLoading(() => false);
       }
     };
@@ -227,6 +229,7 @@ const Room = () => {
         console.log("No space found with the given id");
         return;
       }
+
       let score = "";
       let comment = "";
       let spaceRate = "";
@@ -234,48 +237,54 @@ const Room = () => {
       let filteredSpace = "";
 
       console.log(":::data:::", data);
-      if (data.length > 0) {
-        score = data?.scores
-          ?.filter((score) => score.spaceId == spaceId)
+
+      const getScoreAndComment = (data, scoreId) => {
+        const score = data?.scores
+          ?.filter((score) => score.spaceId == scoreId)
           ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
           ?.slice(0, 1);
 
-        comment = data?.comments
+        const comment = data?.comments
           ?.filter((comment) => comment.ratingId == score[0].id)
           ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
           ?.slice(0, 1);
 
-        console.log("p1[ scores ]]] ", score);
-        console.log("p1[ comment ]]] ", comment);
+        return { score, comment };
+      };
 
-        spaceRate =
-          (Math.round(
-            (score[0].sort + score[0].setInOrder + score[0].shine) / 3
-          ) *
-            10) /
-          10;
+      const calculateSpaceRate = (score) => {
+        return (
+          (Math.round((score.sort + score.setInOrder + score.shine) / 3) * 10) /
+          10
+        );
+      };
+      console.log(">>>data.length <<<", data.length);
+
+      if (data.scores.length > 0) {
+        const { score, comment } = getScoreAndComment(data, spaceId);
+        console.log(">>>score <<<", score);
+        const spaceRate = calculateSpaceRate(score[0]);
         filteredSpace = spaces.filter((sp) => sp.id == spaceId);
+
         newSpace = {
           id: spaceId,
           name: filteredSpace[0].name,
-          score: score ? score[0] : [],
-          rating: spaceRate,
-          comments: comment ? comment[0] : [],
+          score: score[0] ? score[0] : score,
+          rating: spaceRate ? spaceRate : 0,
+          comments: comment[0] ? comment[0] : comment,
         };
       } else {
-        score = data.scores;
-        comment = data.comments;
-        spaceRate =
-          (Math.round((score.sort + score.setInOrder + score.shine) / 3) * 10) /
-          10;
+        const score = data.scores;
+        const comment = data.comments;
+        const spaceRate = calculateSpaceRate(score);
         filteredSpace = spaces.filter((sp) => sp.id == spaceId);
 
         newSpace = {
           id: spaceId,
           name: filteredSpace[0].name,
-          score: score,
-          rating: spaceRate,
-          comments: comment,
+          score: score[0] ? score[0] : score,
+          rating: spaceRate ? spaceRate : 0,
+          comments: comment[0] ? comment[0] : comment,
         };
       }
 
