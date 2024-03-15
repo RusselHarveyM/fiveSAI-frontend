@@ -7,6 +7,8 @@ import classes from "../components/rooms/room/Room.module.css";
 import SpaceNavContent from "../components/rooms/room/SpaceNavContent";
 import Accordion from "../components/UI/Accordion/Accordion";
 
+import evaluateTwo from "../components/rooms/room/evaluateTwo";
+
 import { ClipLoader } from "react-spinners";
 
 const Room = () => {
@@ -110,14 +112,15 @@ const Room = () => {
     const fetchData = async () => {
       try {
         setIsLoading(() => true);
+        const roomData = await axios.get(
+          `https://fivesai-backend-production.up.railway.app/api/rooms/${params.roomId}/room`
+        );
+        setRoomData(() => roomData.data);
         const response = await axios.get(
           `https://fivesai-backend-production.up.railway.app/api/ratings`
         );
         const resComment = await axios.get(
           `https://fivesai-backend-production.up.railway.app/api/comment`
-        );
-        const roomData = await axios.get(
-          `https://fivesai-backend-production.up.railway.app/api/rooms/${params.roomId}/room`
         );
 
         console.log("response response", response.data);
@@ -142,11 +145,41 @@ const Room = () => {
         }));
 
         setSpaceRating(() => spaceRatings);
-        setRoomData(() => roomData.data);
         setData(() => ({ ...newData }));
         setIsLoading(() => false);
       } catch (error) {
         console.log(error);
+        const newRate = {
+          id: "",
+          sort: 0,
+          setInOrder: 0,
+          shine: 0,
+          standarize: 0,
+          sustain: 0,
+          security: 0,
+          isActive: true,
+          spaceId: "",
+        };
+
+        const newComment = {
+          id: "",
+          sort: "",
+          setInOrder: "",
+          shine: "",
+          standarize: "",
+          sustain: "",
+          security: "",
+          isActive: true,
+          ratingId: "",
+        };
+
+        let newData = {
+          scores: newRate,
+          comments: newComment,
+        };
+        setData(() => ({ ...newData }));
+
+        setIsLoading(() => false);
       }
     };
 
@@ -165,7 +198,7 @@ const Room = () => {
           roomSpaceRatings.length) *
           10
       ) / 10;
-    setOverallRating(() => overallRating);
+    setOverallRating(() => (overallRating ? overallRating : 0));
   }, [spaceRating, isRateRefresh]);
 
   useEffect(() => {
@@ -201,7 +234,7 @@ const Room = () => {
       let filteredSpace = "";
 
       console.log(":::data:::", data);
-      if (data.scores.length > 1) {
+      if (data.length > 0) {
         score = data?.scores
           ?.filter((score) => score.spaceId == spaceId)
           ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))

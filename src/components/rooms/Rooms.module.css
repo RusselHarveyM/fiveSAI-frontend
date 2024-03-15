@@ -5,6 +5,16 @@
   justify-content: center;
 }
 
+.imagePlaceHolder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 110px;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
 .roomsContainer {
   align-items: center;
   width: 1024px;
@@ -23,6 +33,10 @@
   border-radius: 10px;
   background-color: #ffd95d;
   margin-bottom: 50px;
+}
+
+.roomsContainer_lists * {
+  text-decoration: none;
 }
 .roomsContainer_cards {
   background-color: rgba(255, 255, 255, 0.8);

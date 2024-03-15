@@ -5,18 +5,23 @@ import axios from "axios";
 import classes from "../components/rooms/Rooms.module.css";
 import { NavLink } from "react-router-dom";
 
+import { ClipLoader } from "react-spinners";
+
 const Rooms = () => {
   const [roomData, setRoomData] = useState([]);
   const [buildingData, setBuildingData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const params = useParams();
 
   useEffect(() => {
     const fetchBuildingData = async () => {
       try {
+        setIsLoading(true);
         const response = await axios.get(
           `https://fivesai-backend-production.up.railway.app/api/buildings/${params.buildingId}/building`
         );
         setBuildingData(response.data);
+        setIsLoading(false);
       } catch (error) {
         console.log(error);
       }
@@ -31,9 +36,7 @@ const Rooms = () => {
           "https://fivesai-backend-production.up.railway.app/api/rooms"
         );
         setRoomData(
-          response.data.filter(
-            (data) => data.buildingId === parseInt(params.buildingId)
-          )
+          response.data.filter((data) => data.buildingId === params.buildingId)
         );
       } catch (error) {
         console.log(error);
@@ -53,29 +56,42 @@ const Rooms = () => {
         className={classes.backButton}
       ></button>
       <div className={classes.roomsContainer_header}>
-        <img
-          src={`data:image/png;base64,${buildingData.image}`}
-          alt="Building preview"
-        />
-        <div className={classes.roomsContainer_header_title}>
-          <h3>{buildingData.buildingName}</h3>
-          <h4>{roomData.length} rooms</h4>
-        </div>
+        {buildingData.image ? (
+          <>
+            {" "}
+            <img
+              src={`data:image/png;base64,${buildingData.image}`}
+              alt="Building preview"
+            />
+            <div className={classes.roomsContainer_header_title}>
+              <h3>{buildingData.buildingName}</h3>
+              <h4>{roomData.length} rooms</h4>
+            </div>
+          </>
+        ) : (
+          <div className={classes.imagePlaceHolder}>
+            <ClipLoader color="#731c23" loading={isLoading} size={40} />
+          </div>
+        )}
       </div>
       <div className={classes.roomsContainer_lists}>
-        {roomData?.map((room) => (
-          <NavLink key={room.id} to={`/${room.id}`}>
-            <Card className={classes.roomsContainer_cards} key={room.id}>
-              <img
-                src={`data:image/png;base64,${room.image}`}
-                alt="room preview"
-              />
-              <div className={classes.roomsContainer_cards_title}>
-                <h4>{room.roomNumber}</h4>
-              </div>
-            </Card>
-          </NavLink>
-        ))}
+        {isLoading ? (
+          <ClipLoader color="#731c23" loading={isLoading} size={40} />
+        ) : (
+          roomData?.map((room) => (
+            <NavLink key={room.id} to={`/${room.id}`}>
+              <Card className={classes.roomsContainer_cards} key={room.id}>
+                <img
+                  src={`data:image/png;base64,${room.image}`}
+                  alt="room preview"
+                />
+                <div className={classes.roomsContainer_cards_title}>
+                  <h4>{room.roomNumber}</h4>
+                </div>
+              </Card>
+            </NavLink>
+          ))
+        )}
       </div>
     </div>
   );
