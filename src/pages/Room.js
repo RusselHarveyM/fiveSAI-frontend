@@ -120,13 +120,20 @@ const Room = () => {
           `https://fivesai-backend-production.up.railway.app/api/rooms/${params.roomId}/room`
         );
 
-        console.log("get data");
+        console.log("response response", response.data);
         let newData = {
           scores: response.data,
           comments: resComment.data,
         };
 
-        const spaceRatings = response?.data.map((rating) => ({
+        const latestSpaceRatings = response?.data
+          .sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified)) // Sort by dateModified in descending order
+          .filter(
+            (rating, index, self) =>
+              index === self.findIndex((r) => r.spaceId === rating.spaceId) // Filter out the first occurrence of each spaceId
+          );
+
+        const spaceRatings = latestSpaceRatings.map((rating) => ({
           id: rating.spaceId,
           rating:
             (Math.round((rating.sort + rating.setInOrder + rating.shine) / 3) *
@@ -148,14 +155,14 @@ const Room = () => {
 
   useEffect(() => {
     // Calculate the overall rating whenever spaceRating changes
-    const roomSpaceRatings = spaceRating.filter(
-      (rating) =>
-        spaces.find((space) => space.id === rating.id)?.roomId === params.roomId
-    );
+    // const roomSpaceRatings = spaceRating.filter(
+    //   (rating) =>
+    //     spaces.find((space) => space.id === rating.id)?.roomId === params.roomId
+    // );
     const overallRating =
       Math.round(
-        (roomSpaceRatings.reduce((acc, curr) => acc + curr.rating, 0) /
-          roomSpaceRatings.length) *
+        (spaceRating.reduce((acc, curr) => acc + curr.rating, 0) /
+          spaceRating.length) *
           10
       ) / 10;
     setOverallRating(() => overallRating);
