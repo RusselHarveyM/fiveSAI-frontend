@@ -82,14 +82,28 @@ const Room = () => {
         ratingId,
       };
 
-      await axios.post(
+      const resComment = await axios.post(
         "https://fivesai-backend-production.up.railway.app/api/comment",
         newComment
       );
+
+      let newRateTemp = newRate;
+      newRateTemp.id = ratingId;
+
+      let newCommentTemp = newComment;
+      newCommentTemp.id = resComment.data;
+
+      let newData = {
+        scores: newRateTemp,
+        comments: newCommentTemp,
+      };
+
+      // Update state with the new data
+      setData(newData);
     } catch (error) {
       console.error(error);
     }
-    setIsRateRefresh(() => !isRateRefresh);
+    setIsRateRefresh((prev) => !prev);
   };
 
   useEffect(() => {
@@ -120,9 +134,9 @@ const Room = () => {
             10,
         }));
 
-        setSpaceRating(spaceRatings);
-        setRoomData(roomData.data);
-        setData(() => newData);
+        setSpaceRating(() => spaceRatings);
+        setRoomData(() => roomData.data);
+        setData(() => ({ ...newData }));
         setIsLoading(() => false);
       } catch (error) {
         console.log(error);
@@ -145,7 +159,7 @@ const Room = () => {
           10
       ) / 10;
     setOverallRating(() => overallRating);
-  }, [spaceRating]);
+  }, [spaceRating, isRateRefresh]);
 
   useEffect(() => {
     const fetchSpaces = async () => {
@@ -173,40 +187,59 @@ const Room = () => {
         console.log("No space found with the given id");
         return;
       }
+      let score = "";
+      let comment = "";
+      let spaceRate = "";
+      let newSpace = "";
+      let filteredSpace = "";
 
-      const score = data.scores
-        ?.filter((score) => score.spaceId == spaceId)
-        ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
-        ?.slice(0, 1);
+      console.log(":::data:::", data);
+      if (data.scores.length > 1) {
+        score = data?.scores
+          ?.filter((score) => score.spaceId == spaceId)
+          ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
+          ?.slice(0, 1);
 
-      const comment = data.comments
-        ?.filter((comment) => comment.ratingId == score[0].id)
-        ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
-        ?.slice(0, 1);
+        comment = data?.comments
+          ?.filter((comment) => comment.ratingId == score[0].id)
+          ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
+          ?.slice(0, 1);
 
-      console.log("p1[ scores ]]] ", score);
-      console.log("p1[ comment ]]] ", comment);
+        console.log("p1[ scores ]]] ", score);
+        console.log("p1[ comment ]]] ", comment);
 
-      const spaceRate =
-        (Math.round(
-          (score[0].sort + score[0].setInOrder + score[0].shine) / 3
-        ) *
-          10) /
-        10;
+        spaceRate =
+          (Math.round(
+            (score[0].sort + score[0].setInOrder + score[0].shine) / 3
+          ) *
+            10) /
+          10;
+        filteredSpace = spaces.filter((sp) => sp.id == spaceId);
+        newSpace = {
+          id: spaceId,
+          name: filteredSpace[0].name,
+          score: score ? score[0] : [],
+          rating: spaceRate,
+          comments: comment ? comment[0] : [],
+        };
+      } else {
+        score = data.scores;
+        comment = data.comments;
+        spaceRate =
+          (Math.round((score.sort + score.setInOrder + score.shine) / 3) * 10) /
+          10;
+        filteredSpace = spaces.filter((sp) => sp.id == spaceId);
 
-      const filteredSpace = spaces.filter((sp) => sp.id == spaceId);
+        newSpace = {
+          id: spaceId,
+          name: filteredSpace[0].name,
+          score: score,
+          rating: spaceRate,
+          comments: comment,
+        };
+      }
 
-      console.log(filteredSpace, "filteredSpace");
-
-      const newSpace = {
-        id: spaceId,
-        name: filteredSpace[0].name,
-        score: score ? score[0] : [],
-        rating: spaceRate,
-        comments: comment ? comment[0] : [],
-      };
-
-      setSpace(newSpace);
+      setSpace(() => ({ ...newSpace }));
     };
 
     try {
@@ -214,11 +247,11 @@ const Room = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [spaceId]);
+  }, [spaceId, isRateRefresh]);
 
-  const onSpaceNavHandler = useCallback(async (res) => {
+  const onSpaceNavHandler = (res) => {
     setSpaceId(res.target.id);
-  }, []);
+  };
 
   return (
     <div className={classes.roomContainer}>
