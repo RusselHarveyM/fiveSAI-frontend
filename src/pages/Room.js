@@ -155,14 +155,14 @@ const Room = () => {
 
   useEffect(() => {
     // Calculate the overall rating whenever spaceRating changes
-    // const roomSpaceRatings = spaceRating.filter(
-    //   (rating) =>
-    //     spaces.find((space) => space.id === rating.id)?.roomId === params.roomId
-    // );
+    const roomSpaceRatings = spaceRating.filter(
+      (rating) =>
+        spaces.find((space) => space.id === rating.id)?.roomId === params.roomId
+    );
     const overallRating =
       Math.round(
-        (spaceRating.reduce((acc, curr) => acc + curr.rating, 0) /
-          spaceRating.length) *
+        (roomSpaceRatings.reduce((acc, curr) => acc + curr.rating, 0) /
+          roomSpaceRatings.length) *
           10
       ) / 10;
     setOverallRating(() => overallRating);
