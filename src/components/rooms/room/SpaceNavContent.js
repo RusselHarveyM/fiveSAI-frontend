@@ -13,12 +13,18 @@ import { ClipLoader } from "react-spinners";
 const apiBaseUrl =
   "https://fivesai-backend-production.up.railway.app/api/spaceimage";
 
-const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
+const SpaceNavContent = ({
+  onData,
+  onScoreHandler,
+  spaceRate,
+  spaceId,
+  onName,
+}) => {
   const [spaceTotalScore, setSpaceTotalScore] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRefresh, setIsRefresh] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [spaceData, setSpaceData] = useState([]);
+  const [spaceData, setSpaceData] = useState(undefined);
 
   useEffect(() => {
     if (spaceId === undefined) return;
@@ -61,22 +67,22 @@ const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("onData id [][][]", onData[0]?.id);
+      console.log("onData id [][][]", onData);
       setIsLoading(() => true);
-      const data = await fetchSpaceData(onData[0]?.id);
+      const data = await fetchSpaceData(spaceId);
       console.log(data, "data");
+      setIsLoading(() => false);
       setSpaceData(data);
     };
     if (spaceId !== undefined) fetchData();
-  }, [isRefresh, onData[0]?.id]);
-  // }, [onData[0]?.id]);
+  }, [isRefresh, spaceId]);
 
   const onSetNewSpaceDataHandler = async (data, selectedImages, isDelete) => {
     if (isDelete) {
       data?.map(deleteSpaceData);
     }
     console.log("onData", onData);
-    selectedImages.map((image) => uploadSpaceData(onData[0]?.id, image));
+    selectedImages.map((image) => uploadSpaceData(spaceId, image));
   };
 
   const onViewImageHandler = useCallback(() => {
@@ -84,6 +90,7 @@ const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
   }, []);
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
+    setIsRefresh(() => !isRefresh);
   }, []);
 
   return (
@@ -116,18 +123,14 @@ const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
         <>
           <header className={classes.spaceTitle}>
             <h2>
-              {onData[0]?.space.name}
-              <sup className={classes.spaceScore}>
-                {spaceRate[0]?.rating}/10
-              </sup>
+              {onName}
+              <sup className={classes.spaceScore}>{spaceRate}/10</sup>
             </h2>
             <div className={classes.spaceTitle_buttons}>
-              {spaceData.length > 0 ? (
+              {spaceData !== undefined ? (
                 <button onClick={onViewImageHandler}>View Images</button>
               ) : (
-                <button onClick={onViewImageHandler} disabled>
-                  View Images
-                </button>
+                <button disabled>View Images</button>
               )}
             </div>
           </header>
@@ -136,7 +139,7 @@ const SpaceNavContent = ({ onData, onScoreHandler, spaceRate, spaceId }) => {
               (title) => (
                 <ScoreCard
                   key={title}
-                  score={onData[0]?.scores?.[title]}
+                  score={onData?.[title]}
                   totalScore={spaceTotalScore}
                   title={title.toUpperCase()}
                 />

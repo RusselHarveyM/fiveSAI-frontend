@@ -46,7 +46,7 @@ const ViewImageOverlay = ({
       isDelete
     );
     setIsEdit((prevIsEdit) => !prevIsEdit);
-    // onConfirm();
+    onConfirm();
   }, [deletedData, selectedImages, isDelete, spaceDataHandler]);
 
   const handleFileChange = useCallback((event) => {
@@ -103,8 +103,11 @@ const ViewImageOverlay = ({
         <h2>Images</h2>
       </div>
       {isLoading ? (
-        // If loading, render the spinner
-        <ClipLoader color="#000" loading={isLoading} size={150} />
+        <div style={{ transform: "scale(3)", padding: "4rem" }}>
+          {" "}
+          {/* Increase the scale value to make the spinner thicker */}
+          <ClipLoader color="#731c23" loading={isLoading} size={40} />
+        </div>
       ) : (
         <>
           <div className={classes.imageContainer}>
@@ -154,9 +157,19 @@ const ViewImageOverlay = ({
             )}
           </div>
           <div className={classes.buttonsContainer}>
-            <button className={classes.evaluateBtn} onClick={onEvaluateHandler}>
-              Evaluate
-            </button>
+            {isLoading ? (
+              <button className={classes.evaluateBtn} disabled>
+                Evaluate
+              </button>
+            ) : (
+              <button
+                className={classes.evaluateBtn}
+                onClick={onEvaluateHandler}
+              >
+                Evaluate
+              </button>
+            )}
+
             {isEdit ? (
               <div className={classes.editBtnContainer}>
                 <button

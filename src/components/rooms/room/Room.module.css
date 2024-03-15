@@ -98,6 +98,13 @@
   color: #731c23;
 }
 
+.roomLoader {
+  position: fixed;
+  transform: scale(3);
+  bottom: 2rem;
+  right: 2.5rem;
+}
+
 .roomContainer_ratings_rating {
   display: flex;
   flex-direction: column;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Card from "../Card/Card";
 import classes from "./Accordion.module.css";
 
-const Accordion = ({ space }) => {
+const Accordion = ({ onData, comments }) => {
   const [isSort, setIsSort] = useState(false);
   const [isSIO, setIsSIO] = useState(false);
   const [isShine, setIsShine] = useState(false);
@@ -11,52 +11,52 @@ const Accordion = ({ space }) => {
   const [isSafety, setIsSafety] = useState(false);
 
   const onSortHandler = () => {
-    setIsSort(!isSort);
-    setIsSIO(false);
-    setIsShine(false);
-    setIsStandardize(false);
-    setIsSustain(false);
-    setIsSafety(false);
+    setIsSort(() => !isSort);
+    setIsSIO(() => false);
+    setIsShine(() => false);
+    setIsStandardize(() => false);
+    setIsSustain(() => false);
+    setIsSafety(() => false);
   };
   const onSIOHandler = () => {
-    setIsSort(false);
-    setIsSIO(!isSIO);
-    setIsShine(false);
-    setIsStandardize(false);
-    setIsSustain(false);
-    setIsSafety(false);
+    setIsSort(() => false);
+    setIsSIO(() => !isSIO);
+    setIsShine(() => false);
+    setIsStandardize(() => false);
+    setIsSustain(() => false);
+    setIsSafety(() => false);
   };
   const onShineHandler = () => {
-    setIsSort(false);
-    setIsSIO(false);
+    setIsSort(() => false);
+    setIsSIO(() => false);
     setIsShine(!isShine);
-    setIsStandardize(false);
-    setIsSustain(false);
-    setIsSafety(false);
+    setIsStandardize(() => false);
+    setIsSustain(() => false);
+    setIsSafety(() => false);
   };
   const onStandardizeHandler = () => {
-    setIsSort(false);
-    setIsSIO(false);
-    setIsShine(false);
-    setIsStandardize(!isStandardize);
-    setIsSustain(false);
-    setIsSafety(false);
+    setIsSort(() => false);
+    setIsSIO(() => false);
+    setIsShine(() => false);
+    setIsStandardize(() => !isStandardize);
+    setIsSustain(() => false);
+    setIsSafety(() => false);
   };
   const onSustainHandler = () => {
-    setIsSort(false);
-    setIsSIO(false);
-    setIsShine(false);
-    setIsStandardize(false);
-    setIsSustain(!isSustain);
-    setIsSafety(false);
+    setIsSort(() => false);
+    setIsSIO(() => false);
+    setIsShine(() => false);
+    setIsStandardize(() => false);
+    setIsSustain(() => !isSustain);
+    setIsSafety(() => false);
   };
   const onSafetyHandler = () => {
-    setIsSort(false);
-    setIsSIO(false);
-    setIsShine(false);
-    setIsStandardize(false);
-    setIsSustain(false);
-    setIsSafety(!isSafety);
+    setIsSort(() => false);
+    setIsSIO(() => false);
+    setIsShine(() => false);
+    setIsStandardize(() => false);
+    setIsSustain(() => false);
+    setIsSafety(() => !isSafety);
   };
 
   return (
@@ -69,8 +69,8 @@ const Accordion = ({ space }) => {
           <h3>SORT</h3>
           <div className={classes.accordionContainer_comments}>
             <p>
-              {space[0]?.comments?.sort
-                ? space[0]?.comments?.sort
+              {onData?.comments?.sort
+                ? onData?.comments?.sort
                 : "No comments yet."}
             </p>
           </div>
@@ -88,8 +88,8 @@ const Accordion = ({ space }) => {
           <h3>SET IN ORDER</h3>
           <div className={classes.accordionContainer_comments}>
             <p>
-              {space[0]?.comments?.setInOrder
-                ? space[0]?.comments?.setInOrder
+              {onData?.comments?.setInOrder
+                ? onData?.comments?.setInOrder
                 : "No comments yet."}
             </p>
           </div>
@@ -107,8 +107,8 @@ const Accordion = ({ space }) => {
           <h3>SHINE</h3>
           <div className={classes.accordionContainer_comments}>
             <p>
-              {space[0]?.comments?.shine
-                ? space[0]?.comments?.shine
+              {onData?.comments?.shine
+                ? onData?.comments?.shine
                 : "No comments yet."}
             </p>
           </div>
@@ -129,8 +129,8 @@ const Accordion = ({ space }) => {
           <h3>STANDARDIZE</h3>
           <div className={classes.accordionContainer_comments}>
             <p>
-              {space[0]?.comments?.standarize
-                ? space[0]?.comments?.standarize
+              {onData?.comments?.standarize
+                ? onData?.comments?.standarize
                 : "No comments yet."}
             </p>
           </div>
@@ -152,8 +152,8 @@ const Accordion = ({ space }) => {
           <h3>SUSTAIN</h3>
           <div className={classes.accordionContainer_comments}>
             <p>
-              {space[0]?.comments?.sustain
-                ? space[0]?.comments?.sustain
+              {onData?.comments?.sustain
+                ? onData?.comments?.sustain
                 : "No comments yet."}
             </p>
           </div>

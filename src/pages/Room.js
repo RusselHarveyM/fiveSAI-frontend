@@ -7,6 +7,8 @@ import classes from "../components/rooms/room/Room.module.css";
 import SpaceNavContent from "../components/rooms/room/SpaceNavContent";
 import Accordion from "../components/UI/Accordion/Accordion";
 
+import { ClipLoader } from "react-spinners";
+
 const Room = () => {
   const [roomData, setRoomData] = useState();
   const [spaces, setSpaces] = useState([]);
@@ -15,6 +17,11 @@ const Room = () => {
   const [overallRating, setOverallRating] = useState(0.0);
   const [spaceRating, setSpaceRating] = useState([]);
   const [remark, setRemark] = useState("NOT CALIBRATED");
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRateRefresh, setIsRateRefresh] = useState(false);
+
+  console.log("space >>>{{{{", space);
 
   useEffect(() => {
     if (overallRating >= 1 && overallRating <= 4) {
@@ -28,132 +35,102 @@ const Room = () => {
 
   const params = useParams();
 
-  const onScoreHandler = useCallback(
-    async (raw5s) => {
-      console.log("raw5s >>>{{{{", raw5s);
+  const onScoreHandler = useCallback(async (raw5s) => {
+    console.log("raw5s >>>{{{{", raw5s);
 
-      const { sort, set, shine } = raw5s.comment;
-      const { score: sortScore } = raw5s.result.sort;
-      const { score: setScore } = raw5s.result.set;
-      const { score: shineScore } = raw5s.result.shine;
+    const { sort, set, shine } = raw5s.comment;
+    const { score: sortScore } = raw5s.result.sort;
+    const { score: setScore } = raw5s.result.set;
+    const { score: shineScore } = raw5s.result.shine;
 
-      const sortScoreFixed = parseFloat(sortScore.toFixed(1));
-      const setScoreFixed = parseFloat(setScore.toFixed(1));
-      const shineScoreFixed = parseFloat(shineScore.toFixed(1));
+    const sortScoreFixed = parseFloat(sortScore.toFixed(1));
+    const setScoreFixed = parseFloat(setScore.toFixed(1));
+    const shineScoreFixed = parseFloat(shineScore.toFixed(1));
 
-      const newRate = {
+    const newRate = {
+      id: "",
+      sort: sortScoreFixed,
+      setInOrder: setScoreFixed,
+      shine: shineScoreFixed,
+      standarize: 0,
+      sustain: 0,
+      security: 0,
+      isActive: true,
+      spaceId: space.id,
+    };
+
+    try {
+      let ratingId = "";
+      console.log(newRate, "newRate");
+      const resRate = await axios.post(
+        "https://fivesai-backend-production.up.railway.app/api/ratings",
+        newRate
+      );
+
+      console.log("resRate data >>>> ", resRate.data);
+      ratingId = resRate.data;
+
+      const newComment = {
         id: "",
-        sort: sortScoreFixed,
-        setInOrder: setScoreFixed,
-        shine: shineScoreFixed,
-        standarize: 0,
-        sustain: 0,
-        security: 0,
+        sort: sort,
+        setInOrder: set,
+        shine: shine,
+        standarize: "",
+        sustain: "",
+        security: "",
         isActive: true,
-        spaceId: spaceId,
+        ratingId,
       };
 
-      console.log("space >>>{{{{", space);
-
-      try {
-        let ratingId = "";
-        let commentId = "";
-
-        if (
-          (space[0].scores?.length == 0 && space[0].comments?.length == 0) ||
-          (space[0]?.scores == undefined && space[0]?.comments == undefined)
-        ) {
-          const resRate = await axios.post(
-            "https://fivesai-backend-production.up.railway.app/api/ratings",
-            newRate
-          );
-
-          console.log("resRate data >>>> ", resRate.data);
-          ratingId = resRate.data;
-
-          const newComment = {
-            id: "",
-            sort: sort,
-            setInOrder: set,
-            shine: shine,
-            standarize: "",
-            sustain: "",
-            security: "",
-            isActive: true,
-            ratingId,
-          };
-
-          await axios.post(
-            "https://fivesai-backend-production.up.railway.app/api/comment",
-            newComment
-          );
-        } else {
-          const spaceTemp = space.filter((sp) => sp.id === spaceId);
-
-          console.log("space 22222 >>>> ", spaceTemp);
-
-          const rateId = spaceTemp[0]?.scores?.id;
-
-          newRate.id = rateId;
-
-          console.log("newRate >>>> ", newRate);
-          console.log("spaceId [][][][][]>>>> ", spaceId);
-
-          const resRate = await axios.put(
-            `https://fivesai-backend-production.up.railway.app/api/ratings/${rateId}`,
-            newRate
-          );
-
-          ratingId = resRate.data;
-          commentId = space[0]?.comments?.id;
-
-          const newComment = {
-            id: commentId,
-            sort: sort,
-            setInOrder: set,
-            shine: shine,
-            standarize: "",
-            sustain: "",
-            security: "",
-            isActive: true,
-            ratingId,
-          };
-
-          await axios.put(
-            `https://fivesai-backend-production.up.railway.app/api/comment/${commentId}`,
-            newComment
-          );
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    [space, spaceId]
-  );
-
-  const populateSpaceRating = async () => {
-    try {
-      const response = await axios.get(
-        "https://fivesai-backend-production.up.railway.app/api/ratings"
+      await axios.post(
+        "https://fivesai-backend-production.up.railway.app/api/comment",
+        newComment
       );
-      const ratings = response.data;
-      const spaceRatings = ratings.map((rating) => ({
-        id: rating.spaceId,
-        rating:
-          (Math.round((rating.sort + rating.setInOrder + rating.shine) / 3) *
-            10) /
-          10,
-      }));
-
-      setSpaceRating(spaceRatings);
     } catch (error) {
       console.error(error);
     }
-  };
+    setIsRateRefresh(() => !isRateRefresh);
+  }, []);
 
   useEffect(() => {
-    populateSpaceRating();
-  }, [spaceId]);
+    const fetchData = async () => {
+      try {
+        setIsLoading(() => true);
+        const response = await axios.get(
+          `https://fivesai-backend-production.up.railway.app/api/ratings`
+        );
+        const resComment = await axios.get(
+          `https://fivesai-backend-production.up.railway.app/api/comment`
+        );
+        const roomData = await axios.get(
+          `https://fivesai-backend-production.up.railway.app/api/rooms/${params.roomId}/room`
+        );
+
+        console.log("get data");
+        let newData = {
+          scores: response.data,
+          comments: resComment.data,
+        };
+
+        const spaceRatings = response?.data.map((rating) => ({
+          id: rating.spaceId,
+          rating:
+            (Math.round((rating.sort + rating.setInOrder + rating.shine) / 3) *
+              10) /
+            10,
+        }));
+
+        setSpaceRating(spaceRatings);
+        setRoomData(roomData.data);
+        setData(() => newData);
+        setIsLoading(() => false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, [isRateRefresh]);
 
   useEffect(() => {
     // Calculate the overall rating whenever spaceRating changes
@@ -168,21 +145,7 @@ const Room = () => {
           10
       ) / 10;
     setOverallRating(() => overallRating);
-  }, [spaceRating, spaces, params.roomId]);
-
-  useEffect(() => {
-    const fetchRoomData = async () => {
-      try {
-        const response = await axios.get(
-          `https://fivesai-backend-production.up.railway.app/api/rooms/${params.roomId}/room`
-        );
-        setRoomData(response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchRoomData();
-  }, [params.roomId]);
+  }, [spaceRating]);
 
   useEffect(() => {
     const fetchSpaces = async () => {
@@ -206,55 +169,44 @@ const Room = () => {
 
   useEffect(() => {
     const updateSpace = async () => {
-      for (const space of spaces) {
-        console.log("im in ");
-        console.log("im in space", space);
-        if (space.length === 0) {
-          console.log("No space found with the given id");
-          return;
-        }
-        var response;
-        var resComment;
-        try {
-          response = await axios.get(
-            `https://fivesai-backend-production.up.railway.app/api/ratings`
-          );
-          resComment = await axios.get(
-            `https://fivesai-backend-production.up.railway.app/api/comment`
-          );
-        } catch (error) {
-          console.log(error);
-        }
-
-        console.log("p1[", response);
-        console.log("space.id[", spaceId);
-
-        const scores = response?.data?.filter(
-          (score) => score.spaceId == spaceId
-        );
-
-        console.log("p1[ scores ]]] ", scores);
-
-        const comments = resComment?.data?.filter(
-          (comment) =>
-            comment.ratingId == (scores.length > 0 ? scores[0].id : null)
-        );
-
-        setSpace((prevSpace) => {
-          const newSpace = prevSpace.filter((sp) => sp.id !== space.id);
-          console.log("sp spsp >>> ", newSpace);
-          console.log("sp prevSpace >>> ", prevSpace);
-          return [
-            ...newSpace,
-            {
-              id: space.id,
-              space: space,
-              scores: scores ? scores[0] : [],
-              comments: comments ? comments[0] : [],
-            },
-          ];
-        });
+      if (spaceId === undefined) {
+        console.log("No space found with the given id");
+        return;
       }
+
+      const score = data.scores
+        ?.filter((score) => score.spaceId == spaceId)
+        ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
+        ?.slice(0, 1);
+
+      const comment = data.comments
+        ?.filter((comment) => comment.ratingId == score[0].id)
+        ?.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified))
+        ?.slice(0, 1);
+
+      console.log("p1[ scores ]]] ", score);
+      console.log("p1[ comment ]]] ", comment);
+
+      const spaceRate =
+        (Math.round(
+          (score[0].sort + score[0].setInOrder + score[0].shine) / 3
+        ) *
+          10) /
+        10;
+
+      const filteredSpace = spaces.filter((sp) => sp.id == spaceId);
+
+      console.log(filteredSpace, "filteredSpace");
+
+      const newSpace = {
+        id: spaceId,
+        name: filteredSpace[0].name,
+        score: score ? score[0] : [],
+        rating: spaceRate,
+        comments: comment ? comment[0] : [],
+      };
+
+      setSpace(newSpace);
     };
 
     try {
@@ -267,8 +219,6 @@ const Room = () => {
   const onSpaceNavHandler = useCallback(async (res) => {
     setSpaceId(res.target.id);
   }, []);
-
-  console.log("space rating >>>> ", spaceRating);
 
   return (
     <div className={classes.roomContainer}>
@@ -295,9 +245,10 @@ const Room = () => {
           </div>
         </Card>
         <SpaceNavContent
-          onData={space.filter((s) => s.id === spaceId)}
+          onData={space.score}
+          onName={space.name}
           onScoreHandler={onScoreHandler}
-          spaceRate={spaceRating.filter((rating) => rating.id === spaceId)}
+          spaceRate={space.rating}
           spaceId={spaceId}
         />
       </div>
@@ -315,9 +266,12 @@ const Room = () => {
           <h3>{remark}</h3>
         </div>
         <h1>5S+ Rating</h1>
-        <Accordion space={space.filter((s) => s.id === spaceId)} />
+        <Accordion onData={space} />
       </div>
       <div className={classes.roomContainer_redTags}></div>
+      <div className={classes.roomLoader}>
+        <ClipLoader color="#731c23" loading={isLoading} size={20} />
+      </div>
     </div>
   );
 };
