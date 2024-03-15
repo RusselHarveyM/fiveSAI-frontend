@@ -56,7 +56,7 @@ const Overlay = memo(
         event.preventDefault();
         const data = {
           Id: roomId,
-          buildingId: parseInt(event.target[0].value),
+          buildingId: event.target[0].value,
           roomNumber: event.target[1].value,
           status: event.target[2].value,
           image: image,
@@ -77,7 +77,7 @@ const Overlay = memo(
         event.preventDefault();
         const data = {
           Id: "",
-          buildingId: parseInt(event.target[0].value),
+          buildingId: event.target[0].value,
           roomNumber: event.target[1].value,
           status: event.target[2].value,
           image: newImage,
@@ -151,7 +151,9 @@ const Overlay = memo(
             <label>Building Id</label>
             <select className={classes.select} id="buildingId">
               {buildings?.map((building) => (
-                <option value={building.id}>{building.buildingCode}</option>
+                <option kay={building.id} value={building.id}>
+                  {building.buildingCode}
+                </option>
               ))}
             </select>
             <label>Name</label>
