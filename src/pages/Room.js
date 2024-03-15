@@ -35,7 +35,7 @@ const Room = () => {
 
   const params = useParams();
 
-  const onScoreHandler = useCallback(async (raw5s) => {
+  const onScoreHandler = async (raw5s) => {
     console.log("raw5s >>>{{{{", raw5s);
 
     const { sort, set, shine } = raw5s.comment;
@@ -90,7 +90,7 @@ const Room = () => {
       console.error(error);
     }
     setIsRateRefresh(() => !isRateRefresh);
-  }, []);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
