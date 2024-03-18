@@ -10,6 +10,7 @@ import Accordion from "../components/UI/Accordion/Accordion";
 import evaluateTwo from "../components/rooms/room/evaluateTwo";
 
 import { ClipLoader } from "react-spinners";
+import { parse } from "date-fns";
 
 const Room = () => {
   const [roomData, setRoomData] = useState();
@@ -49,13 +50,25 @@ const Room = () => {
     const setScoreFixed = parseFloat(setScore.toFixed(1));
     const shineScoreFixed = parseFloat(shineScore.toFixed(1));
 
+    console.log(" III data III", data);
+
+    const totalScore = data.scores?.reduce(
+      (acc, score) => acc + (score.sort + score.setInOrder + score.shine) / 3,
+      0
+    );
+
+    let averageScore = totalScore / data.scores?.length;
+    averageScore = Math.min(Math.max(averageScore, 1), 10);
+
+    const sustainScoreFixed = parseFloat(averageScore.toFixed(1));
+
     const newRate = {
       id: "",
       sort: sortScoreFixed,
       setInOrder: setScoreFixed,
       shine: shineScoreFixed,
       standarize: 0,
-      sustain: 0,
+      sustain: sustainScoreFixed,
       security: 0,
       isActive: true,
       spaceId: space.id,
