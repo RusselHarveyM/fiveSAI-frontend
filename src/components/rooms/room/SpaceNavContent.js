@@ -135,7 +135,7 @@ const SpaceNavContent = ({
             </div>
           </header>
           <div className={classes.spaceBody}>
-            {["sort", "setInOrder", "shine", "standardize", "sustain"].map(
+            {["sort", "setInOrder", "shine", "standarize", "sustain"].map(
               (title) => (
                 <ScoreCard
                   key={title}
