@@ -144,7 +144,7 @@ const Accordion = ({ onData, comments }) => {
         </div>
       )}
 
-      {/* {isSustain ? (
+      {isSustain ? (
         <div
           className={classes.accordionContainer_item}
           onClick={onSustainHandler}
@@ -165,7 +165,7 @@ const Accordion = ({ onData, comments }) => {
         >
           <h3>SUSTAIN</h3>
         </div>
-      )} */}
+      )}
     </Card>
   );
 };
