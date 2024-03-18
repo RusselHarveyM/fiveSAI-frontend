@@ -154,7 +154,13 @@ const Room = () => {
         const spaceRatings = latestSpaceRatings.map((rating) => ({
           id: rating.spaceId,
           rating:
-            (Math.round((rating.sort + rating.setInOrder + rating.shine) / 3) *
+            (Math.round(
+              (rating.sort +
+                rating.setInOrder +
+                rating.shine +
+                rating.sustain) /
+                4
+            ) *
               10) /
             10,
         }));
