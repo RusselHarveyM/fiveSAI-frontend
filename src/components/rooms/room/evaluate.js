@@ -298,31 +298,49 @@ async function computeScores(s3, isClutterResults) {
     10;
 
   //set score
-  const organizationScore = (set.organization / idealOrganization) * 6;
-  const atLeastOneHVACScore =
-    (set.aircon + set.exhaust + set.ventilation >= idealAEV ? 1 : 0) * 4;
+  const organizationScore = (SET.organization === 0 ? 1 : 0) * 3; // Weight for organization
 
-  const setScore = ((organizationScore + atLeastOneHVACScore) / 10) * 10;
+  const totalSetScore = Math.max(
+    1,
+    Math.min(
+      ((1 -
+        SET.ventilation / 10 +
+        (1 - SET.aircon / 10) +
+        (1 - SET.exhaust / 10) +
+        organizationScore * 2) * // Additional weight for organization
+        10) /
+        6,
+      10
+    )
+  ); // Scale to fit within 1 to 10 range
 
   // shine score
   // const totalCount = Object.values(shine).reduce((total, c) => total + c, 0);
   // const maxCount = Math.max(...Object.values(shine));
 
   // Calculate the score based on the distance from zero
-  const shineScore = Object.values(shine).reduce(
-    (total, c) => total + (1 - c),
-    0
-  );
+  const damageScore = (shine.damage === 0 ? 1 : 0) * 1; // Weight for damages
+
+  const totalShineScore =
+    ((1 -
+      shine.adhesives / 10 +
+      (1 - shine.dirt / 10) +
+      (1 - shine.dust / 10) +
+      (1 - shine.litter / 10) +
+      (1 - shine.smudge / 10) +
+      (1 - shine.stain / 10) +
+      damageScore * 3) * // Additional weight for damages
+      10) /
+    8; // Scale to fit within 1 to 10 range
 
   // Normalize the score to be between 0 and 1
-  const normalizedShineScore = shineScore / Object.keys(shine).length;
 
   // Scale the score to be between 1 and 10
-  const scaledShineScore = normalizedShineScore * 9 + 1;
 
   s3.sort.score = sortScore;
-  s3.set.score = setScore;
-  s3.shine.score = scaledShineScore;
+  s3.set.score = totalSetScore;
+  s3.shine.score = totalShineScore;
+
   return s3;
 }
 
