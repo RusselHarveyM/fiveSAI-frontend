@@ -424,6 +424,7 @@ async function evaluate(images) {
 
   let organizationCountImage = 0;
   let length = images[0].length;
+  let organizeScore = 0;
 
   // Loop through the images array
   for (let index = 0; index < length; index++) {
@@ -439,6 +440,7 @@ async function evaluate(images) {
 
     if (count.count >= 10) {
       await organizationCheck(image, set);
+      organizeScore += set.organization;
       organizationCountImage++;
     }
     await blueDetection(image, sort, set);
@@ -476,7 +478,11 @@ async function evaluate(images) {
   const comments = await commentGeneration(overalls3, length);
 
   console.log("srResultsssss >>>>> ", s3Results);
-  return { result: overalls3, comment: comments };
+  return {
+    result: overalls3,
+    comment: comments,
+    standardize: organizeScore / length,
+  };
 }
 
 export default evaluate;
