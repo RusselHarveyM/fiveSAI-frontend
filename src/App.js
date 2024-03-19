@@ -5,13 +5,15 @@ import {
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Rooms from "./pages/Rooms";
 import Room from "./pages/Room";
 
 const routeDefinition = createRoutesFromElements(
   <Route path="/">
-    <Route index={true} element={<Dashboard />}></Route>
+    <Route path="/" element={<Login />}></Route>
+    <Route path= "/dashboard" element={<Dashboard />}></Route>
     <Route path="/:buildingId/rooms">
       <Route index={true} element={<Rooms />}></Route>
     </Route>
