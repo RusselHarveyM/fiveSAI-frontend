@@ -415,6 +415,18 @@ async function evaluate(images) {
         comments[prop] += `\n• ${subProp}: ${overallS3Copy[prop][subProp]};`;
       }
     }
+    if (prop === "sort")
+      comments[
+        prop
+      ] += `\n\n To achieve a high score in ${prop}, please make sure that the area is clutter-free.`;
+    if (prop === "set")
+      comments[
+        prop
+      ] += `\n\n To achieve a high score in ${prop}, desks and chairs should be properly organized.`;
+    if (prop === "shine")
+      comments[
+        prop
+      ] += `\n\n To achieve a high score in ${prop}, Aim for a score of 0 for each criteria listed.`;
   }
 
   console.log("comments >>>>> ", comments);
