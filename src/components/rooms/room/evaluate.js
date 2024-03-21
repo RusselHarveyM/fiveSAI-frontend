@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_KEY = "aGGzTIu56n8TOSWVfudS";
+const API_KEY = "zKSEIJWU9jceFvUIL8pz";
 
 const SORT = {
   wasteDisposal: 0,
@@ -117,7 +117,11 @@ async function personalBelongingsCheck(image) {
     .catch(function (error) {
       console.log(error.message);
     });
-  return response.predictions;
+
+  let personalBelongings = response.predictions.filter(
+    (pred) => pred.class === "personal belongings"
+  );
+  return personalBelongings;
 }
 
 async function blueDetection(image, sort, set) {
@@ -191,85 +195,57 @@ async function cleanlinessDetection(image, shine) {
   });
 }
 
-// Define a function to check if a desk or chair is cluttered based on personal belongings
 function isCluttered(dcObjects, pbObjects) {
-  // Create an array to store clutteredness status for each object
   let clutteredStatus = [];
 
-  if (pbObjects.length == 0) return clutteredStatus;
+  /*
+  # Bounding box
+boundb = {
+    'x': 150,
+    'y': 150,
+    'height': 50,
+    'width': 100
+}
 
-  // Iterate over each object in dcObjects
-  dcObjects.forEach((dcObject) => {
-    // Find the corresponding pbObject based on positions
-    let pbObject = findCorrespondingPBObject(dcObject, pbObjects);
+# Inner box
+innerb = {
+    'x': 160,
+    'y': 160,
+    'height': 25,
+    'width': 25
+}
 
-    let object = {
-      class: dcObject.class,
-      x: dcObject.x,
-      y: dcObject.y,
-      width: dcObject.width,
-      height: dcObject.height,
-      points: pbObject ? pbObject.points : [], // Use points if pbObject is found, otherwise empty array
-      isClutter: false,
-    };
+# If top-left inner box corner is inside the bounding box
+if boundb['x'] < innerb['x'] and boundb['y'] < innerb['y']:
+    # If bottom-right inner box corner is inside the bounding box
+    if innerb['x'] + innerb['width'] < boundb['x'] + boundb['width'] \
+            and innerb['y'] + innerb['height'] < boundb['y'] + boundb['height']:
+        print('The entire box is inside the bounding box.')
+    else:
+        print('Some part of the box is outside the bounding box.')
 
-    // Calculate the center of the bounding box
-    const centerX = object.x + object.width / 2;
-    const centerY = object.y + object.height / 2;
+  */
 
-    // Calculate the half of the diagonal of the bounding box
-    const halfDiagonal =
-      Math.sqrt(Math.pow(object.width, 2) + Math.pow(object.height, 2)) / 2;
+  const PBObjects = pbObjects;
+  if (PBObjects.length === 0 || dcObjects.length === 0) return clutteredStatus;
 
-    // Count the number of personal belongings within the bounding box
-    let numPersonalBelongings = 0;
-    for (let i = 0; i < object.points.length; i++) {
-      // Calculate the Euclidean distance between the center of the bounding box and the point
-      let point = object.points[i];
-      const distance = Math.sqrt(
-        Math.pow(point.x - centerX, 2) + Math.pow(point.y - centerY, 2)
-      );
+  console.log(" PBObjects>>>> ??? ", PBObjects);
+  console.log(" dcObjects>>>> ??? ", dcObjects);
 
-      // Check if the distance is less than or equal to the half of the diagonal
-      if (distance <= halfDiagonal) {
-        numPersonalBelongings++;
+  PBObjects.forEach((pbObject) => {
+    dcObjects.forEach((dcObject) => {
+      if (
+        pbObject.x < dcObject.x + dcObject.width &&
+        pbObject.x + pbObject.width > dcObject.x &&
+        pbObject.y < dcObject.y + dcObject.height &&
+        pbObject.y + pbObject.height > dcObject.y
+      ) {
+        clutteredStatus.push(dcObject);
       }
-    }
-
-    // Define a threshold for clutteredness (you can adjust this threshold based on your requirements)
-    const clutterThreshold = 1; // For example, if there are more than 2 personal belongings, consider it cluttered
-
-    // Check if the number of personal belongings exceeds the threshold
-    if (numPersonalBelongings >= clutterThreshold) {
-      object.isClutter = true;
-    }
-    clutteredStatus.push(object);
+    });
   });
 
   return clutteredStatus;
-}
-
-// Function to find corresponding pbObject based on positions
-function findCorrespondingPBObject(dcObject, pbObjects) {
-  // Iterate over pbObjects and find the one whose position is closest to dcObject
-  let minDistance = Infinity;
-  let closestPBObject = null;
-
-  pbObjects.forEach((pbObject) => {
-    // Calculate the distance between dcObject and pbObject (using the Euclidean distance)
-    let distance = Math.sqrt(
-      Math.pow(dcObject.x - pbObject.x, 2) +
-        Math.pow(dcObject.y - pbObject.y, 2)
-    );
-
-    // Update closestPBObject if the distance is smaller
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestPBObject = pbObject;
-    }
-  });
-
-  return closestPBObject;
 }
 
 async function computeScores(s3, isClutterResults) {
@@ -315,13 +291,10 @@ async function computeScores(s3, isClutterResults) {
   // const maxCount = Math.max(...Object.values(shine));
 
   // Calculate the score based on the distance from zero
-  const shineScore = Object.values(shine).reduce(
-    (total, c) => total + (c === "damage" ? -10 : 1 - c),
-    0
-  );
-  const normalizedShineScore = shineScore / (Object.keys(shine).length + 1);
-  const scaledShineScore = normalizedShineScore * 10;
-
+  const shineScore = Object.values(shine).reduce((total, c) => total + c, 0);
+  const maxScore = Object.keys(shine).length;
+  const normalizedShineScore = maxScore - shineScore;
+  const scaledShineScore = (normalizedShineScore / maxScore) * 10;
   // Normalize the score to be between 0 and 1
 
   // Scale the score to be between 1 and 10
@@ -371,7 +344,7 @@ async function evaluate(images) {
     }
     await blueDetection(image, sort, set);
     const pb_result = await personalBelongingsCheck(image);
-    const ic_result = isCluttered(count.data.predictions, pb_result);
+    const ic_result = isCluttered(predictions, pb_result);
     await cleanlinessDetection(image, shine);
     let s3 = {
       sort: sort,
@@ -415,15 +388,15 @@ async function evaluate(images) {
         comments[prop] += `\n• ${subProp}: ${overallS3Copy[prop][subProp]};`;
       }
     }
-    if (prop === "sort")
+    if (prop === "sort" && overallS3Copy[prop].score < 10)
       comments[
         prop
       ] += `\n\n To achieve a high score in ${prop}, please make sure that the area is clutter-free.`;
-    if (prop === "set")
+    if (prop === "set" && overallS3Copy[prop].score < 10)
       comments[
         prop
       ] += `\n\n To achieve a high score in ${prop}, desks and chairs should be properly organized.`;
-    if (prop === "shine")
+    if (prop === "shine" && overallS3Copy[prop].score < 10)
       comments[
         prop
       ] += `\n\n To achieve a high score in ${prop}, Aim for a score of 0 for each criteria listed.`;
