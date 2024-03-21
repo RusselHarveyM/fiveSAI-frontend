@@ -13,6 +13,10 @@ const SORT = {
 };
 
 const SET = {
+  chairs: 0,
+  desks: 0,
+  disorganizedRow: 0,
+  organizedRow: 0,
   organization: 0,
   ventilation: 0,
   aircon: 0,
@@ -57,13 +61,6 @@ async function countDesksChairs(image) {
 }
 
 async function organizationCheck(image, set) {
-  let response = {
-    predictions: [],
-  };
-  let results = {
-    organized: [],
-    disorganized: [],
-  };
   await axios({
     method: "POST",
     url: "https://detect.roboflow.com/classroom-order-seg/9",
@@ -76,20 +73,26 @@ async function organizationCheck(image, set) {
     },
   })
     .then(function (res) {
-      response = res;
       console.log("organize check >>>", res.data);
+      res.data.predictions.map((prediction) => {
+        if (prediction.class === "disorganized") set.disorganizedRow++;
+        if (prediction.class === "organized") set.organizedRow++;
+      });
     })
     .catch(function (error) {
       console.log(error.message);
     });
-  results.disorganized = [
-    response?.predictions?.filter((pred) => pred.class == "disorganized"),
-  ];
-  results.organized = [
-    response?.predictions?.filter((pred) => pred.class == "organized"),
-  ];
-  let overall = results.organized.length + results.disorganized.length;
-  set.organization = (results.organized.length / overall) * 10;
+  // results.disorganized = [
+  //   response?.predictions?.map((pred) => pred.class == "disorganized"),
+  // ];
+  // results.organized = [
+  //   response?.predictions?.map((pred) => pred.class == "organized"),
+  // ];
+
+  let overall = set.organizedRow + set.disorganizedRow;
+  set.organization = (set.organizedRow / overall) * 10;
+  // set.organizedRow = results.organized.length;
+  // set.disorganizedRow = results.disorganized.length;
 }
 
 async function personalBelongingsCheck(image) {
@@ -298,137 +301,36 @@ async function computeScores(s3, isClutterResults) {
     10;
 
   //set score
-  const organizationScore = (SET.organization === 0 ? 1 : 0) * 3; // Weight for organization
+  // const organizationScore = (set.organization / idealOrganization) * 8;
+  const atLeastOneHVACScore =
+    (set.aircon + set.exhaust + set.ventilation >= idealAEV ? 1 : 0) * 2;
 
-  const totalSetScore = Math.max(
-    1,
-    Math.min(
-      ((1 -
-        SET.ventilation / 10 +
-        (1 - SET.aircon / 10) +
-        (1 - SET.exhaust / 10) +
-        organizationScore * 2) * // Additional weight for organization
-        10) /
-        6,
-      10
-    )
-  ); // Scale to fit within 1 to 10 range
+  const setScore = Math.max(
+    ((set.organization + atLeastOneHVACScore) / 10) * 10,
+    1
+  );
 
   // shine score
   // const totalCount = Object.values(shine).reduce((total, c) => total + c, 0);
   // const maxCount = Math.max(...Object.values(shine));
 
   // Calculate the score based on the distance from zero
-  const damageScore = (shine.damage === 0 ? 1 : 0) * 1; // Weight for damages
-
-  const totalShineScore =
-    ((1 -
-      shine.adhesives / 10 +
-      (1 - shine.dirt / 10) +
-      (1 - shine.dust / 10) +
-      (1 - shine.litter / 10) +
-      (1 - shine.smudge / 10) +
-      (1 - shine.stain / 10) +
-      damageScore * 3) * // Additional weight for damages
-      10) /
-    8; // Scale to fit within 1 to 10 range
+  const shineScore = Object.values(shine).reduce(
+    (total, c) => total + (c === "damage" ? -10 : 1 - c),
+    0
+  );
+  const normalizedShineScore = shineScore / (Object.keys(shine).length + 1);
+  const scaledShineScore = normalizedShineScore * 10;
 
   // Normalize the score to be between 0 and 1
 
   // Scale the score to be between 1 and 10
 
   s3.sort.score = sortScore;
-  s3.set.score = totalSetScore;
-  s3.shine.score = totalShineScore;
+  s3.set.score = setScore;
+  s3.shine.score = scaledShineScore >= 0 ? scaledShineScore : 0;
 
   return s3;
-}
-
-async function commentGeneration(overalls3, imageNumber) {
-  let sortComment = "";
-  let setComment = "";
-  let shineComment = "";
-
-  const SORT_CHECKLIST = {
-    wasteDisposal: "Ensure proper waste disposal",
-    clutter: "Minimize clutter",
-    cabinet: "Organize cabinets",
-    danglings: "Check for any danglings",
-    drawer: "Organize drawers",
-    shelf: "Organize shelves",
-    score: "Evaluate sorting efficiency",
-  };
-
-  const SET_CHECKLIST = {
-    organization: "Maintain overall organization like the desks and chairs",
-    ventilation: "Ensure proper ventilation",
-    aircon: "Check air conditioning",
-    exhaust: "Check exhaust systems",
-    score: "Evaluate setting effectiveness",
-  };
-
-  const SHINE_CHECKLIST = {
-    adhesives: "Remove any adhesives",
-    damage: "Repair any damages",
-    dirt: "Clean dirt",
-    dust: "Remove dust",
-    litter: "Dispose of litter",
-    smudge: "Clean smudges",
-    stain: "Remove stains",
-    score: "Evaluate cleaning standards",
-  };
-
-  // Comment for sorting
-  if (overalls3.sort.score >= 7) {
-    sortComment = "Most of the Items are sorted.";
-  } else if (overalls3.sort.score >= 5) {
-    sortComment = "Some Items are needed to be sorted.";
-  } else {
-    sortComment = "Consider improving sorting efficiency by:";
-    for (const prop in SORT_CHECKLIST) {
-      if (prop !== "score") {
-        if (overalls3.sort[prop] === 0) {
-          sortComment += `\n- ${SORT_CHECKLIST[prop]}`;
-        }
-      }
-    }
-  }
-
-  // Comment for setting
-  if (overalls3.set.score >= 7) {
-    setComment = "Great job on setting everything up!";
-  } else if (overalls3.set.score >= 5) {
-    setComment = "Nice effort in setting things!";
-  } else {
-    setComment = "Consider improving setting by:";
-    for (const prop in SET_CHECKLIST) {
-      if (prop !== "score") {
-        setComment += `\n- ${SET_CHECKLIST[prop]}`;
-      }
-    }
-  }
-
-  // Comment for shining
-  if (overalls3.shine.score >= 7) {
-    shineComment = "The place is shining brilliantly!";
-  } else if (overalls3.shine.score >= 5) {
-    shineComment = "Well done in keeping things shiny!";
-  } else {
-    shineComment = "Ensure better cleaning by:";
-    for (const prop in SHINE_CHECKLIST) {
-      if (prop !== "score") {
-        if (overalls3.shine[prop] === 0) {
-          shineComment += `\n- ${SHINE_CHECKLIST[prop]}`;
-        }
-      }
-    }
-  }
-
-  return {
-    sort: sortComment,
-    set: setComment,
-    shine: shineComment,
-  };
 }
 
 async function evaluate(images) {
@@ -442,7 +344,8 @@ async function evaluate(images) {
 
   let organizationCountImage = 0;
   let length = images[0].length;
-  let organizeScore = 0;
+
+  // let organizeScore = 0;
 
   // Loop through the images array
   for (let index = 0; index < length; index++) {
@@ -452,13 +355,18 @@ async function evaluate(images) {
 
     const image = images[0][index];
 
-    console.log("index {}{}{}{}{}{}", index);
-
     const count = await countDesksChairs(image);
+    const predictions = count.data.predictions;
+    console.log("count {}{}{}{}{}{}", count);
+    predictions.map((prediction) => {
+      console.log("prediction.class >>>> ", prediction.class);
+      if (prediction.class == "desk") set.desks++;
+      if (prediction.class == "chair") set.chairs++;
+    });
 
     if (count.count >= 10) {
       await organizationCheck(image, set);
-      organizeScore += set.organization;
+      // organizeScore += set.organization;
       organizationCountImage++;
     }
     await blueDetection(image, sort, set);
@@ -493,13 +401,29 @@ async function evaluate(images) {
 
   overalls3.shine.score /= length;
 
-  const comments = await commentGeneration(overalls3, length);
+  let comments = {
+    sort: "",
+    set: "",
+    shine: "",
+  };
+
+  let overallS3Copy = { ...overalls3 };
+
+  for (let prop in overallS3Copy) {
+    for (let subProp in overallS3Copy[prop]) {
+      if (subProp !== "score" && subProp !== "organization") {
+        comments[prop] += `\n• ${subProp}: ${overallS3Copy[prop][subProp]};`;
+      }
+    }
+  }
+
+  console.log("comments >>>>> ", comments);
 
   console.log("srResultsssss >>>>> ", s3Results);
   return {
     result: overalls3,
     comment: comments,
-    standardize: organizeScore / length,
+    // standardize: organizeScore / length,
   };
 }
 

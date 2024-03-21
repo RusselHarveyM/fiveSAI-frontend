@@ -3,7 +3,7 @@ import Card from "../Card/Card";
 import classes from "./Accordion.module.css";
 
 const Accordion = ({ onData, comments }) => {
-  const [isSort, setIsSort] = useState(false);
+  const [isSort, setIsSort] = useState(true);
   const [isSIO, setIsSIO] = useState(false);
   const [isShine, setIsShine] = useState(false);
   const [isStandardize, setIsStandardize] = useState(false);
@@ -121,7 +121,7 @@ const Accordion = ({ onData, comments }) => {
           <h3>SHINE</h3>
         </div>
       )}
-      {isStandardize ? (
+      {/* {isStandardize ? (
         <div
           className={classes.accordionContainer_item}
           onClick={onStandardizeHandler}
@@ -142,9 +142,9 @@ const Accordion = ({ onData, comments }) => {
         >
           <h3>STANDARDIZE</h3>
         </div>
-      )}
+      )} */}
 
-      {isSustain ? (
+      {/* {isSustain ? (
         <div
           className={classes.accordionContainer_item}
           onClick={onSustainHandler}
@@ -165,7 +165,7 @@ const Accordion = ({ onData, comments }) => {
         >
           <h3>SUSTAIN</h3>
         </div>
-      )}
+      )} */}
     </Card>
   );
 };

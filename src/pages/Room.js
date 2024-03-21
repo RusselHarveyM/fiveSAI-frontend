@@ -45,14 +45,14 @@ const Room = () => {
     const { score: sortScore } = raw5s.result.sort;
     const { score: setScore } = raw5s.result.set;
     const { score: shineScore } = raw5s.result.shine;
-    let standardize = raw5s.standardize;
+    // let standardize = raw5s.standardize;
 
     const sortScoreFixed = parseFloat(sortScore.toFixed(1));
     const setScoreFixed = parseFloat(setScore.toFixed(1));
     const shineScoreFixed = parseFloat(shineScore.toFixed(1));
 
     console.log(" III data III", data);
-    console.log(" III standardize III", standardize);
+    // console.log(" III standardize III", standardize);
 
     const totalScore = data.scores?.reduce(
       (acc, score) => acc + (score.sort + score.setInOrder + score.shine) / 3,
@@ -61,9 +61,9 @@ const Room = () => {
 
     let averageScore = totalScore / data.scores?.length;
     averageScore = Math.min(Math.max(averageScore, 1), 10);
-    standardize = Math.min(Math.max(standardize, 1), 10);
+    // standardize = Math.min(Math.max(standardize, 1), 10);
 
-    const standardizeScooreFixed = parseFloat(raw5s.standardize.toFixed(1));
+    // const standardizeScooreFixed = parseFloat(raw5s.standardize.toFixed(1));
 
     const sustainScoreFixed = parseFloat(averageScore.toFixed(1));
 
@@ -72,8 +72,8 @@ const Room = () => {
       sort: sortScoreFixed,
       setInOrder: setScoreFixed,
       shine: shineScoreFixed,
-      standarize: standardizeScooreFixed,
-      sustain: sustainScoreFixed,
+      standarize: 0,
+      sustain: 0,
       security: 0,
       isActive: true,
       spaceId: space.id,
@@ -159,14 +159,7 @@ const Room = () => {
         const spaceRatings = latestSpaceRatings.map((rating) => ({
           id: rating.spaceId,
           rating:
-            (Math.round(
-              (rating.sort +
-                rating.setInOrder +
-                rating.shine +
-                rating.sustain +
-                rating.standarize) /
-                5
-            ) *
+            (Math.round((rating.sort + rating.setInOrder + rating.shine) / 3) *
               10) /
             10,
         }));
@@ -280,14 +273,7 @@ const Room = () => {
 
       const calculateSpaceRate = (score) => {
         return (
-          (Math.round(
-            (score?.sort +
-              score?.setInOrder +
-              score?.shine +
-              score?.sustain +
-              score?.standarize) /
-              5
-          ) *
+          (Math.round((score?.sort + score?.setInOrder + score?.shine) / 5) *
             10) /
           10
         );
