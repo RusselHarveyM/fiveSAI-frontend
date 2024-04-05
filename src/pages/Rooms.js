@@ -18,7 +18,7 @@ const Rooms = () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `https://fivesai-backend-production.up.railway.app/api/buildings/${params.buildingId}/building`
+          `https://fs-backend-copy-production.up.railway.app/api/buildings/${params.buildingId}/building`
         );
         setBuildingData(response.data);
         setIsLoading(false);
@@ -33,7 +33,7 @@ const Rooms = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://fivesai-backend-production.up.railway.app/api/rooms"
+          "https://fs-backend-copy-production.up.railway.app/api/rooms"
         );
         setRoomData(
           response.data.filter((data) => data.buildingId === params.buildingId)

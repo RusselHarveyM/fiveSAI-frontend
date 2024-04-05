@@ -5,7 +5,7 @@ import Overlay from "../../UI/Modal/BuildingOverlay";
 
 const BuildingContent = ({ onData }) => {
   const urls = [
-    `https://fivesai-backend-production.up.railway.app/api/buildings/`,
+    `https://fs-backend-copy-production.up.railway.app/api/buildings/`,
   ];
 
   const [buildingHeaders] = useState([

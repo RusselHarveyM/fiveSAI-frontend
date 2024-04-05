@@ -83,7 +83,7 @@ const Room = () => {
       let ratingId = "";
       console.log(newRate, "newRate");
       const resRate = await axios.post(
-        "https://fivesai-backend-production.up.railway.app/api/ratings",
+        "https://fs-backend-copy-production.up.railway.app/api/ratings",
         newRate
       );
 
@@ -103,7 +103,7 @@ const Room = () => {
       };
 
       const resComment = await axios.post(
-        "https://fivesai-backend-production.up.railway.app/api/comment",
+        "https://fs-backend-copy-production.up.railway.app/api/comment",
         newComment
       );
 
@@ -131,14 +131,14 @@ const Room = () => {
       try {
         setIsLoading(() => true);
         const roomData = await axios.get(
-          `https://fivesai-backend-production.up.railway.app/api/rooms/${params.roomId}/room`
+          `https://fs-backend-copy-production.up.railway.app/api/rooms/${params.roomId}/room`
         );
         setRoomData(() => roomData.data);
         const response = await axios.get(
-          `https://fivesai-backend-production.up.railway.app/api/ratings`
+          `https://fs-backend-copy-production.up.railway.app/api/ratings`
         );
         const resComment = await axios.get(
-          `https://fivesai-backend-production.up.railway.app/api/comment`
+          `https://fs-backend-copy-production.up.railway.app/api/comment`
         );
 
         console.log("response response", response.data);
@@ -225,7 +225,7 @@ const Room = () => {
     const fetchSpaces = async () => {
       try {
         const response = await axios.get(
-          `https://fivesai-backend-production.up.railway.app/api/space`
+          `https://fs-backend-copy-production.up.railway.app/api/space`
         );
         setSpaces(() => {
           return response.data.filter((space) => space.roomId === roomData?.id);

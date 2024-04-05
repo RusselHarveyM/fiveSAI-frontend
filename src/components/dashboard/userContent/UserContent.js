@@ -6,7 +6,7 @@ import Content from "../Content";
 import addIcon from "../../../static/images/add-user.png";
 
 const UserContent = () => {
-  const urls = [`https://fivesai-backend-production.up.railway.app/api/user/`];
+  const urls = [`https://fs-backend-copy-production.up.railway.app/api/user/`];
 
   const [userHeaders] = useState([
     { Header: "Id", accessor: "id" },

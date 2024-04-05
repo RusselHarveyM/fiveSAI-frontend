@@ -18,7 +18,7 @@ const Overlay = memo(
         try {
           await axios
             .get(
-              `https://fivesai-backend-production.up.railway.app/api/buildings`
+              `https://fs-backend-copy-production.up.railway.app/api/buildings`
             )
             .then((data) => {
               setBuildings(data.data);

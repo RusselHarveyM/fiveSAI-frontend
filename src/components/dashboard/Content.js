@@ -65,7 +65,9 @@ const Content = ({
       if (isMore) {
         try {
           await axios
-            .get(`http://fivesai-backend/api/spaceimage/get/${rowId}`)
+            .get(
+              `https://fs-backend-copy-production.up.railway.app/api/spaceimage/get/${rowId}`
+            )
             .then((data) => {
               setImages(data);
               console.log(data);

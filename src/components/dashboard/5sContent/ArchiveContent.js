@@ -5,7 +5,7 @@ import addIcon from "../../../static/images/add.png";
 
 const ArchiveContent = () => {
   const urls = [
-    `https://fivesai-backend-production.up.railway.app/api/ratings/`,
+    `https://fs-backend-copy-production.up.railway.app/api/ratings/`,
   ];
 
   const [archiveHeaders] = useState([

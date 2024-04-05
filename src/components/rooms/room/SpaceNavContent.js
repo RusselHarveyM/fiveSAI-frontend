@@ -11,7 +11,7 @@ import ScoreCard from "./ScoreCard.js";
 import { ClipLoader } from "react-spinners";
 
 const apiBaseUrl =
-  "https://fivesai-backend-production.up.railway.app/api/spaceimage";
+  "https://fs-backend-copy-production.up.railway.app/api/spaceimage";
 
 const SpaceNavContent = ({
   onData,
